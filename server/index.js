@@ -8,11 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
-}));
+app.use(cors()); // Allow all for Vercel production hosting
 app.use(express.json({ limit: '50mb' }));
 
 // Multer for in-memory image uploads (max 10MB)
@@ -41,7 +37,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n🏥 Med-Verify API Server running on http://localhost:${PORT}`);
-  console.log(`📡 Health check: http://localhost:${PORT}/health\n`);
-});
+// Only listen if executed directly (not when imported as a serverless module by Vercel)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n🏥 Med-Verify API Server running on http://localhost:${PORT}`);
+    console.log(`📡 Health check: http://localhost:${PORT}/health\n`);
+  });
+}
+
+// Export for Vercel serverless functions
+module.exports = app;
