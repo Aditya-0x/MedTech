@@ -92,7 +92,10 @@ router.post('/verify', async (req, res) => {
 
   } catch (err) {
     console.error('❌ Verify route error:', err.message);
-    const message = err.response?.data?.message || err.message || 'Unknown error';
+    const message = err.response?.data?.error?.message 
+      || err.response?.data?.message 
+      || err.message 
+      || 'Unknown error';
     res.status(500).json({ error: `Verification failed: ${message}` });
   }
 });

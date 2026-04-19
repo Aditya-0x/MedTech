@@ -43,7 +43,10 @@ Be precise, cite the provided WHO/Healthfinder data where relevant, and never re
  * Call Gemini REST API directly with a specific model + API version
  */
 async function callGeminiREST(model, apiVersion, prompt) {
-  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  if (!apiKey) {
+    throw new Error('Missing GEMINI_API_KEY in environment variables. Please configure it in your Vercel project settings.');
+  }
   const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`;
 
   const body = {
