@@ -613,11 +613,55 @@
 }
 
 @media (max-width: 640px) {
-  .verdictBanner { padding: 22px; }
-  .tabContent { padding: 22px; }
-  .tabs { padding: 0 18px; }
-  .sourceBadges { padding: 14px 22px; }
-  .footer { padding: 18px 22px; }
-  .disclaimer { margin: 0 22px 22px; }
+  .verdictBanner { 
+    padding: 22px; 
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .verdictLeft {
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .verdictIconWrap {
+    width: 48px;
+    height: 48px;
+  }
+  .verdictLabel {
+    font-size: 1.25rem;
+  }
+  .confidenceBlock {
+    text-align: left;
+    width: 100%;
+  }
+  .confidenceBar {
+    margin-left: 0;
+    width: 100%;
+  }
+  .tabContent { padding: 22px 16px; }
+  .tabs { 
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabBtn {
+    padding: 14px 16px;
+    font-size: 0.8rem;
+  }
+  .sourceBadges { padding: 14px 16px; }
+  .footer { padding: 18px 16px; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .disclaimer { margin: 0 16px 22px; padding: 14px 16px; }
   .sourceGrid { grid-template-columns: 1fr; }
+  
+  .factItem {
+    padding: 12px 14px;
+    gap: 10px;
+    font-size: 0.85rem;
+  }
+  .claimBox {
+    padding: 14px 16px;
+  }
+  .warningBox {
+    padding: 14px 16px;
+  }
 }

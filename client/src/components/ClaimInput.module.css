@@ -166,3 +166,25 @@
 }
 
 .pill:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Mobile Responsiveness ───────────────────── */
+@media (max-width: 640px) {
+  .inputWrapper {
+    padding: 20px 16px;
+    border-radius: var(--shape-lg);
+  }
+  
+  .inputFooter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .hint {
+    display: none;
+  }
+  
+  .textarea {
+    min-height: 140px;
+  }
+}
