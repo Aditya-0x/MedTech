@@ -6,15 +6,33 @@ export default function ImageUpload({ onVerify, isLoading }) {
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
   const [extraClaim, setExtraClaim] = useState('');
+  const [error, setError] = useState(null);
   const inputRef = useRef(null);
 
   const handleFile = (f) => {
-    if (!f || !f.type.startsWith('image/')) return;
+    if (!f) return;
+    setError(null);
+
+    // Validate mime-type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(f.type)) {
+      setError('Unsupported file format. Please upload a JPG, JPEG, PNG, WEBP, or GIF screenshot.');
+      return;
+    }
+
+    // Validate file size (10MB limit)
+    const maxSize = 10 * 1024 * 1024;
+    if (f.size > maxSize) {
+      setError('Screenshot exceeds size limit. Please upload an image smaller than 10MB.');
+      return;
+    }
+
     setFile(f);
     const reader = new FileReader();
     reader.onload = (e) => setPreview(e.target.result);
     reader.readAsDataURL(f);
   };
+
 
   const onDrop = useCallback((e) => {
     e.preventDefault();
@@ -48,58 +66,72 @@ export default function ImageUpload({ onVerify, isLoading }) {
   const clearFile = () => {
     setFile(null);
     setPreview(null);
+    setError(null);
     if (inputRef.current) inputRef.current.value = '';
   };
 
   return (
     <div className={styles.container} onPaste={handlePaste}>
       {!preview ? (
-        <div
-          className={`${styles.dropZone} ${dragOver ? styles.dragOver : ''}`}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
-          onClick={() => inputRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
-          id="image-upload-zone"
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            className={styles.fileInput}
-            onChange={(e) => handleFile(e.target.files[0])}
-          />
-          <div className={styles.dropIcon}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="3"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21 15 16 10 5 21"/>
-            </svg>
-          </div>
-          <div className={styles.dropTitle}>
-            {dragOver ? 'Drop your screenshot here' : 'Upload Social Media Screenshot'}
-          </div>
-          <div className={styles.dropDesc}>
-            Drag & drop, click to browse, or <span className={styles.highlight}>Ctrl+V</span> to paste
-          </div>
-          <div className={styles.dropFormats}>
-            Supports: PNG, JPG, WEBP, GIF · Max 10MB
-          </div>
+        <>
+          <div
+            className={`${styles.dropZone} ${dragOver ? styles.dragOver : ''}`}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            onDragLeave={onDragLeave}
+            onClick={() => inputRef.current?.click()}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
+            id="image-upload-zone"
+          >
+            <input
+              ref={inputRef}
+              type="file"
+              accept="image/*"
+              className={styles.fileInput}
+              onChange={(e) => handleFile(e.target.files[0])}
+            />
+            <div className={styles.dropIcon}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+            </div>
+            <div className={styles.dropTitle}>
+              {dragOver ? 'Drop your screenshot here' : 'Upload Social Media Screenshot'}
+            </div>
+            <div className={styles.dropDesc}>
+              Drag & drop, click to browse, or <span className={styles.highlight}>Ctrl+V</span> to paste
+            </div>
+            <div className={styles.dropFormats}>
+              Supports: PNG, JPG, WEBP, GIF · Max 10MB
+            </div>
 
-          <div className={styles.dropExamples}>
-            <span className={styles.examplesLabel}>Works great with:</span>
-            <div className={styles.examplesPills}>
-              <span className={styles.exPill}>Instagram posts</span>
-              <span className={styles.exPill}>Twitter/X threads</span>
-              <span className={styles.exPill}>Facebook screenshots</span>
-              <span className={styles.exPill}>TikTok captions</span>
-              <span className={styles.exPill}>WhatsApp forwards</span>
+            <div className={styles.dropExamples}>
+              <span className={styles.examplesLabel}>Works great with:</span>
+              <div className={styles.examplesPills}>
+                <span className={styles.exPill}>Instagram posts</span>
+                <span className={styles.exPill}>Twitter/X threads</span>
+                <span className={styles.exPill}>Facebook screenshots</span>
+                <span className={styles.exPill}>TikTok captions</span>
+                <span className={styles.exPill}>WhatsApp forwards</span>
+              </div>
             </div>
           </div>
-        </div>
+          {error && (
+            <div className={styles.errorBox} role="alert">
+              <div className={styles.errorTitle}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff5e7d" strokeWidth="2.5" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Upload Validation Error
+              </div>
+              <p className={styles.errorText}>{error}</p>
+            </div>
+          )}
+        </>
       ) : (
         <div className={styles.previewArea}>
           <div className={styles.previewHeader}>

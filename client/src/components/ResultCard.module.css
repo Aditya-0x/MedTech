@@ -665,3 +665,290 @@
     padding: 14px 16px;
   }
 }
+
+/* ── Deep Science Synthesis Elements ── */
+.scienceSection {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.scienceHeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.scienceHeaderTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-high);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.academicGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.academicCard {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-top: 3px solid #b388ff; /* secondary verdict color */
+  border-radius: var(--shape-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.academicCard:hover {
+  border-color: rgba(179, 136, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(179, 136, 255, 0.1);
+}
+
+.academicCardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.academicPubDate {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-low);
+}
+
+.academicTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-high);
+  line-height: 1.4;
+  margin: 0 0 10px 0;
+}
+
+.academicAuthors {
+  font-size: 0.78rem;
+  color: var(--text-medium);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+.academicJournal {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #b388ff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.academicLink {
+  font-size: 0.78rem;
+  color: #00e5cc;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+}
+
+.academicLink:hover {
+  color: #5df5c0;
+}
+
+/* Clinical Trials list */
+.trialCard {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-left: 3px solid #ff80ab;
+  border-radius: var(--shape-md);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+.trialCard:hover {
+  border-color: rgba(255, 128, 171, 0.35);
+  transform: translateX(4px);
+}
+
+.trialHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.trialNct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ff80ab;
+}
+
+.trialBadges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.trialStatus {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 128, 171, 0.1);
+  color: #ff80ab;
+  border: 1px solid rgba(255, 128, 171, 0.2);
+  text-transform: uppercase;
+}
+
+.trialPhase {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(0, 229, 204, 0.08);
+  color: #00e5cc;
+  border: 1px solid rgba(0, 229, 204, 0.18);
+  text-transform: uppercase;
+}
+
+.trialTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-high);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.trialConditions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.conditionPill {
+  font-size: 11px;
+  color: var(--text-medium);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 8px;
+  border-radius: var(--shape-xs);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* FDA Alert cards */
+.fdaCard {
+  position: relative;
+  background: rgba(255, 171, 64, 0.03);
+  border: 1px solid rgba(255, 171, 64, 0.12);
+  border-left: 3px solid #ffab40;
+  border-radius: var(--shape-md);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fdaHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fdaRecallNum {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffab40;
+}
+
+.fdaClass {
+  font-size: 10px;
+  font-weight: 900;
+  background: rgba(255, 107, 138, 0.1);
+  color: #ff6b8a;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 107, 138, 0.2);
+}
+
+.fdaProd {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-high);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.fdaReason {
+  font-size: 0.83rem;
+  color: var(--text-medium);
+  line-height: 1.6;
+}
+
+.fdaFirm {
+  font-size: 11px;
+  color: var(--text-low);
+  margin-top: 4px;
+}
+
+/* Banner buttons */
+.bannerActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: -4px;
+  flex-wrap: wrap;
+}
+
+.actionBtnMini {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionBtnMini:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.actionBtnMiniSaved {
+  background: rgba(93, 245, 192, 0.08);
+  border-color: rgba(93, 245, 192, 0.3);
+  color: #5df5c0;
+}
+
+.actionBtnMiniSaved:hover {
+  background: rgba(93, 245, 192, 0.12);
+  border-color: rgba(93, 245, 192, 0.4);
+}

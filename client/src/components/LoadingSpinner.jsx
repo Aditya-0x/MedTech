@@ -5,7 +5,7 @@ const STEPS = [
   { id: 1, icon: '👁', label: 'OCR Processing', sublabel: 'Mistral OCR extracting text from image...' },
   { id: 2, icon: '📊', label: 'Querying WHO Database', sublabel: 'Fetching global health statistics...' },
   { id: 3, icon: '🏥', label: 'Evidence Collection', sublabel: 'Retrieving MyHealthfinder guidelines...' },
-  { id: 4, icon: '🧠', label: 'AI Reasoning', sublabel: 'Gemini 2.0 Flash synthesizing verdict...' },
+  { id: 4, icon: '🧠', label: 'AI Reasoning', sublabel: 'Gemini Frontier Models synthesizing verdict...' },
 ];
 
 export default function LoadingSpinner({ hasImage = false }) {

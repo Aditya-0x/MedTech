@@ -57,7 +57,7 @@ const VERDICT_CONFIG = {
   }
 };
 
-export default function ResultCard({ result, onReset }) {
+export default function ResultCard({ result, onReset, isAuthenticated, isSaved, onSave }) {
   const [ocrExpanded, setOcrExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('analysis');
 
@@ -68,6 +68,14 @@ export default function ResultCard({ result, onReset }) {
   const confidence = result.verdict?.confidence || 0;
   const whoSources = result.sources?.who || [];
   const healthfinderSources = result.sources?.healthfinder || [];
+
+  const pubmedList = result.sources?.pubmed || result.verdict?.bibliography?.pubmed || [];
+  const clinicalTrialsList = result.sources?.clinicalTrials || result.verdict?.bibliography?.clinicalTrials || [];
+  const fdaAlertsList = result.sources?.fdaAlerts || result.verdict?.bibliography?.fdaAlerts || [];
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
     <div className={styles.card} id="result-card">
@@ -86,6 +94,29 @@ export default function ResultCard({ result, onReset }) {
             </div>
             <div className={styles.verdictHeadline}>
               {result.verdict?.headline || 'Analysis complete'}
+            </div>
+            
+            {/* Action Banner buttons */}
+            <div className={styles.bannerActions}>
+              {isAuthenticated && (
+                <button
+                  type="button"
+                  className={`${styles.actionBtnMini} ${isSaved ? styles.actionBtnMiniSaved : ''}`}
+                  onClick={onSave}
+                  disabled={isSaved}
+                  id="save-history-btn"
+                >
+                  {isSaved ? '✓ Saved to History' : '📥 Save to History'}
+                </button>
+              )}
+              <button 
+                type="button" 
+                className={styles.actionBtnMini} 
+                onClick={handlePrint} 
+                id="export-pdf-btn"
+              >
+                🖨️ Export PDF Report
+              </button>
             </div>
           </div>
         </div>
@@ -138,8 +169,9 @@ export default function ResultCard({ result, onReset }) {
       {/* ── Tab navigation ── */}
       <div className={styles.tabs}>
         {[
-          { id: 'analysis', label: '📋 Analysis' },
-          { id: 'sources', label: `📊 Sources (${whoSources.length + healthfinderSources.length})` },
+          { id: 'analysis', label: '📋 Clinical Synthesis' },
+          { id: 'evidence', label: `🔬 Scientific Evidence (${pubmedList.length + clinicalTrialsList.length + fdaAlertsList.length})` },
+          { id: 'sources', label: `📊 Public Health Databases (${whoSources.length + healthfinderSources.length})` },
           { id: 'related', label: '🔗 Related Topics' }
         ].map(tab => (
           <button
@@ -192,6 +224,104 @@ export default function ResultCard({ result, onReset }) {
           <div className={styles.claimBox}>
             <div className={styles.claimLabel}>📌 Claim Analyzed</div>
             <p className={styles.claimText}>"{result.claim}"</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Scientific Evidence Base tab ── */}
+      {activeTab === 'evidence' && (
+        <div className={`${styles.tabContent} animate-fade`}>
+          {/* PubMed peer-reviewed papers */}
+          <div className={styles.scienceSection}>
+            <div className={styles.scienceHeaderRow}>
+              <h3 className={styles.scienceHeaderTitle}>📚 PubMed Peer-Reviewed Literature</h3>
+            </div>
+            {pubmedList.length > 0 ? (
+              <div className={styles.academicGrid}>
+                {pubmedList.map((paper, idx) => (
+                  <div key={idx} className={styles.academicCard}>
+                    <div>
+                      <div className={styles.academicCardHead}>
+                        <span className={styles.academicPubDate}>📅 {paper.year}</span>
+                      </div>
+                      <h4 className={styles.academicTitle}>{paper.title}</h4>
+                      <div className={styles.academicAuthors}>By {paper.authors}</div>
+                    </div>
+                    <div>
+                      <div className={styles.academicJournal}>{paper.journal}</div>
+                      {paper.url && (
+                        <a href={paper.url} target="_blank" rel="noopener noreferrer" className={styles.academicLink}>
+                          View on PubMed ↗
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.noSources}>No peer-reviewed articles found directly matching this claim.</p>
+            )}
+          </div>
+
+          {/* ClinicalTrials.gov Ongoing and Completed trials */}
+          <div className={styles.scienceSection}>
+            <div className={styles.scienceHeaderRow}>
+              <h3 className={styles.scienceHeaderTitle}>🔬 ClinicalTrials.gov Studies</h3>
+            </div>
+            {clinicalTrialsList.length > 0 ? (
+              <div className={styles.hfList}>
+                {clinicalTrialsList.map((trial, idx) => (
+                  <div key={idx} className={styles.trialCard}>
+                    <div className={styles.trialHeader}>
+                      <span className={styles.trialNct}>{trial.nctId}</span>
+                      <div className={styles.trialBadges}>
+                        <span className={styles.trialStatus}>{trial.status}</span>
+                        <span className={styles.trialPhase}>{trial.phase}</span>
+                      </div>
+                    </div>
+                    <h4 className={styles.trialTitle}>{trial.title}</h4>
+                    {trial.conditions && trial.conditions.length > 0 && (
+                      <div className={styles.trialConditions}>
+                        {trial.conditions.map((cond, cIdx) => (
+                          <span key={cIdx} className={styles.conditionPill}>{cond}</span>
+                        ))}
+                      </div>
+                    )}
+                    {trial.url && (
+                      <a href={trial.url} target="_blank" rel="noopener noreferrer" className={styles.academicLink}>
+                        View Registry Log ↗
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.noSources}>No registered clinical trial logs found matching this claim.</p>
+            )}
+          </div>
+
+          {/* OpenFDA Recall Alerts */}
+          <div className={styles.scienceSection}>
+            <div className={styles.scienceHeaderRow}>
+              <h3 className={styles.scienceHeaderTitle}>⚠️ OpenFDA Drug Alerts & Recalls</h3>
+            </div>
+            {fdaAlertsList.length > 0 ? (
+              <div className={styles.hfList}>
+                {fdaAlertsList.map((alert, idx) => (
+                  <div key={idx} className={styles.fdaCard}>
+                    <div className={styles.fdaHead}>
+                      <span className={styles.fdaRecallNum}>{alert.recallNumber}</span>
+                      <span className={styles.fdaClass}>{alert.classification || alert.status}</span>
+                    </div>
+                    <h4 className={styles.fdaProd}>{alert.productDescription}</h4>
+                    <p className={styles.fdaReason}><strong>Reason for Recall:</strong> {alert.reasonForRecall}</p>
+                    <div className={styles.fdaFirm}>🏢 Recalling Firm: {alert.recallingFirm}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={styles.noSources}>No active product recalls or safety alerts found for this claim's substances.</p>
+            )}
           </div>
         </div>
       )}

@@ -299,3 +299,30 @@
     text-align: center;
   }
 }
+
+.errorBox {
+  margin-top: 16px;
+  background: var(--md-error-container);
+  border: 1px solid rgba(255, 107, 138, 0.25);
+  border-radius: var(--shape-md);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: fadeInUp var(--duration-medium) var(--ease-expressive) forwards;
+}
+
+.errorTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--md-error);
+}
+
+.errorText {
+  font-size: 0.82rem;
+  color: var(--text-high);
+}
+
