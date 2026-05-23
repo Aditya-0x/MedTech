@@ -21,33 +21,34 @@
 .title {
   font-size: 28px; /* close to h2 */
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.95); /* textHigh */
+  color: var(--text-high);
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .subtitle {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.55); /* textMedium */
+  color: var(--text-medium);
   margin-top: 6px;
   margin-bottom: 0;
 }
 
 .refreshBtn {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 9999px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-high);
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  backdrop-filter: blur(8px);
   transition: all 0.2s ease;
 }
 
 .refreshBtn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--glass-border-focus);
   transform: translateY(-1px);
 }
 
@@ -95,21 +96,21 @@
 
 /* Glassmorphic History Card */
 .card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.04) 100%);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
   border-radius: 24px; /* md / lg shapes */
   padding: 24px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--duration-medium) cubic-bezier(0.2, 0, 0, 1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   min-height: 240px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--glass-shadow);
 }
 
 /* Card refraction shine */
@@ -119,13 +120,13 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.12) 30%, rgba(255, 255, 255, 0.22) 50%, rgba(255, 255, 255, 0.12) 70%, transparent 95%);
+  background: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.15) 30%, rgba(255, 255, 255, 0.22) 50%, rgba(255, 255, 255, 0.15) 70%, transparent 95%);
 }
 
 .card:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
-  transform: translateY(-3px);
+  border-color: var(--glass-border-focus);
+  box-shadow: var(--glass-shadow-lg);
+  transform: translateY(-3px) scale(1.01);
 }
 
 .cardHead {
@@ -141,6 +142,7 @@
   padding: 4px 10px;
   border-radius: 9999px; /* full shapes */
   letter-spacing: 0.02em;
+  border: 1px solid currentColor;
 }
 
 .confidenceScore {
@@ -152,7 +154,7 @@
 .cardClaim {
   font-size: 15px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-high);
   line-height: 1.45;
   margin: 0 0 8px 0;
   font-style: italic;
@@ -160,7 +162,7 @@
 
 .cardHeadline {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-medium);
   line-height: 1.5;
   margin: 0 0 20px 0;
   flex-grow: 1;
@@ -170,19 +172,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--glass-border);
   padding-top: 14px;
 }
 
 .timestamp {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.38); /* textLow */
+  color: var(--text-low);
 }
 
 .deleteBtn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-low);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -193,8 +195,8 @@
 }
 
 .deleteBtn:hover {
-  color: #ff6b8a; /* verdictFalse */
-  background: rgba(255, 107, 138, 0.1);
+  color: var(--md-error);
+  background: var(--md-error-container);
 }
 
 /* Empty State */
@@ -218,13 +220,13 @@
 .emptyTitle {
   font-size: 18px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-high);
   margin: 0 0 10px 0;
 }
 
 .emptyText {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-medium);
   line-height: 1.6;
   margin: 0 0 28px 0;
 }

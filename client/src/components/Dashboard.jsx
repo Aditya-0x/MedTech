@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import styles from './Dashboard.module.css';
 
 const VERDICT_PILLS = {
-  TRUE: { label: 'TRUE', color: '#5df5c0', bg: 'rgba(93, 245, 192, 0.08)' },
-  FALSE: { label: 'FALSE', color: '#ff6b8a', bg: 'rgba(255, 107, 138, 0.08)' },
-  MISLEADING: { label: 'MISLEADING', color: '#ffcc02', bg: 'rgba(255, 204, 2, 0.08)' },
-  UNVERIFIED: { label: 'UNVERIFIED', color: '#b388ff', bg: 'rgba(179, 136, 255, 0.08)' }
+  TRUE: { label: 'TRUE', color: 'var(--verdict-true)', bg: 'var(--verdict-true-bg)' },
+  FALSE: { label: 'FALSE', color: 'var(--verdict-false)', bg: 'var(--verdict-false-bg)' },
+  MISLEADING: { label: 'MISLEADING', color: 'var(--verdict-misleading)', bg: 'var(--verdict-misleading-bg)' },
+  UNVERIFIED: { label: 'UNVERIFIED', color: 'var(--verdict-unverified)', bg: 'var(--verdict-unverified-bg)' }
 };
 
 export default function Dashboard({ userToken, onSelectReport, onNavigateToVerify }) {
@@ -125,7 +125,7 @@ export default function Dashboard({ userToken, onSelectReport, onNavigateToVerif
                 <div className={styles.cardHead}>
                   <span 
                     className={styles.verdictPill} 
-                    style={{ color: pill.color, backgroundColor: pill.bg, border: `1px solid ${pill.color}25` }}
+                    style={{ color: pill.color, backgroundColor: pill.bg }}
                   >
                     {pill.label}
                   </span>

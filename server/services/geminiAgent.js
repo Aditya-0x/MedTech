@@ -184,7 +184,7 @@ async function callGeminiREST(model, apiVersion, prompt) {
 
   const response = await axios.post(url, body, {
     headers: { 'Content-Type': 'application/json' },
-    timeout: 45000
+    timeout: 15000 // 15s timeout to allow fast fallback if a specific model is hanging
   });
 
   const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -353,8 +353,11 @@ Based on the data above and your medical knowledge, provide your fact-check anal
     } catch (err) {
       const status = err.response?.status || 0;
       const msg = err.response?.data?.error?.message || err.message || '';
-      const isRecoverable = status === 429 || status === 404 || status === 503 ||
-        msg.includes('quota') || msg.includes('not found') || msg.includes('RESOURCE_EXHAUSTED');
+      
+      // Treat timeouts, connection errors (status 0), rate limits (429), quota issues, 500 server errors, and temporary server overloads (503) as recoverable
+      const isRecoverable = status === 429 || status === 404 || status === 503 || status === 500 || status === 0 ||
+        msg.includes('quota') || msg.includes('not found') || msg.includes('RESOURCE_EXHAUSTED') || 
+        msg.includes('timeout') || msg.includes('Network Error') || msg.includes('ENOTFOUND');
 
       console.warn(`⚠️  ${model} (${apiVersion}): ${status} — ${msg.slice(0, 80)}`);
 

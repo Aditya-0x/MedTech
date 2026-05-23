@@ -57,8 +57,8 @@ router.post('/auth/signup', async (req, res) => {
       password: hashedPassword
     });
 
-    // Send Welcome Email asynchronously
-    sendWelcomeEmail(user.email, user.name);
+    // Send Welcome Email securely and await it so it completes fully in serverless (Vercel) environments
+    await sendWelcomeEmail(user.email, user.name);
 
     const token = generateToken(user);
     res.status(201).json({ success: true, token, user: { id: user._id, name: user.name, email: user.email, points: user.points, picture: user.picture } });
@@ -140,8 +140,8 @@ router.post('/auth/google', async (req, res) => {
         picture: payloadData.picture,
         points: 0
       });
-      // Send Welcome Email
-      sendWelcomeEmail(user.email, user.name);
+      // Send Welcome Email securely and await it so it completes fully in serverless (Vercel) environments
+      await sendWelcomeEmail(user.email, user.name);
     } else if (!user.googleId) {
       // Link Google ID if they previously signed up with email
       user.googleId = payloadData.sub;

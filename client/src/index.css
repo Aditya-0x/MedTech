@@ -86,6 +86,78 @@
   --duration-long: 500ms;
 }
 
+/* ── Light Mode Color Theme Overrides ─────────── */
+[data-theme="light"] {
+  /* Tonal palette for high contrast in light mode */
+  --md-primary: #00796b;
+  --md-primary-dim: #004d40;
+  --md-primary-container: rgba(0, 121, 107, 0.06);
+  --md-on-primary: #ffffff;
+  --md-on-primary-container: #00251a;
+
+  --md-secondary: #5e35b1;
+  --md-secondary-dim: #311b92;
+  --md-secondary-container: rgba(94, 53, 177, 0.06);
+  --md-on-secondary-container: #12005e;
+
+  --md-tertiary: #e65100;
+  --md-tertiary-dim: #b53d00;
+  --md-tertiary-container: rgba(230, 81, 0, 0.06);
+
+  --md-error: #d32f2f;
+  --md-error-container: rgba(211, 47, 47, 0.06);
+
+  /* Verdict Colors with high readability */
+  --verdict-true: #00875a;
+  --verdict-true-bg: rgba(0, 135, 90, 0.06);
+  --verdict-false: #de350b;
+  --verdict-false-bg: rgba(222, 53, 11, 0.06);
+  --verdict-misleading: #b68d00;
+  --verdict-misleading-bg: rgba(182, 141, 0, 0.06);
+  --verdict-unverified: #6554c0;
+  --verdict-unverified-bg: rgba(101, 84, 192, 0.06);
+
+  /* Backgrounds */
+  --bg-deep: #f6f5f9;
+  --bg-surface: #ffffff;
+
+  /* Typography */
+  --text-high: rgba(15, 12, 30, 0.94);
+  --text-medium: rgba(15, 12, 30, 0.65);
+  --text-low: rgba(15, 12, 30, 0.38);
+
+  /* Liquid Glass Light Mode */
+  --glass-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.82) 0%,
+    rgba(255, 255, 255, 0.68) 50%,
+    rgba(255, 255, 255, 0.74) 100%
+  );
+  --glass-border: rgba(15, 12, 30, 0.08);
+  --glass-border-focus: rgba(0, 121, 107, 0.3);
+  --glass-shadow: 0 8px 32px rgba(15, 12, 30, 0.06),
+                  0 2px 8px rgba(15, 12, 30, 0.03);
+  --glass-shadow-lg: 0 16px 64px rgba(15, 12, 30, 0.09),
+                     0 4px 16px rgba(15, 12, 30, 0.04);
+}
+
+/* Light mode mesh background overrides */
+[data-theme="light"] body::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(0, 121, 107, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 85% 75%, rgba(94, 53, 177, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(230, 81, 0, 0.015) 0%, transparent 50%);
+}
+
+/* Smooth transition for theme switching */
+body, .glass-card, textarea, input, button, span, p, h1, h2, h3, a, svg, div {
+  transition: background-color var(--duration-medium) var(--ease-emphasized),
+              color var(--duration-medium) var(--ease-emphasized),
+              border-color var(--duration-medium) var(--ease-emphasized),
+              background var(--duration-medium) var(--ease-emphasized),
+              box-shadow var(--duration-medium) var(--ease-emphasized);
+}
+
 html {
   scroll-behavior: smooth;
 }

@@ -11,6 +11,19 @@ import styles from './App.module.css';
 const API_BASE = '/api';
 
 export default function App() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('medverify_theme') || 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('medverify_theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   const [activeTab, setActiveTab] = useState('text'); // 'text' | 'image'
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -182,7 +195,7 @@ export default function App() {
   };
 
   if (currentView === 'login') {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+    return <Login onLoginSuccess={handleLoginSuccess} theme={theme} onToggleTheme={toggleTheme} />;
   }
 
   return (
@@ -193,6 +206,8 @@ export default function App() {
         onViewChange={setCurrentView}
         onLogout={handleLogout}
         showHero={currentView === 'verify' && !result && !isLoading}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       <main className={currentView === 'verify' && isLoading ? styles.mainLoading : styles.main}>

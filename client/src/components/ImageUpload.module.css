@@ -3,7 +3,7 @@
 /* ── Drop zone ───────────────────────────────── */
 .dropZone {
   position: relative;
-  border: 2px dashed rgba(255, 255, 255, 0.10);
+  border: 2px dashed var(--glass-border);
   border-radius: var(--shape-xl);
   padding: 52px 32px;
   text-align: center;
@@ -30,7 +30,7 @@
 }
 
 .dropZone:hover {
-  border-color: rgba(0, 229, 204, 0.35);
+  border-color: var(--glass-border-focus);
   background: rgba(0, 229, 204, 0.03);
   transform: translateY(-3px);
   box-shadow: var(--glass-shadow-lg);
@@ -112,8 +112,8 @@
 
 .exPill {
   padding: 5px 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--shape-full);
   font-size: 0.73rem;
   color: var(--text-medium);
@@ -184,8 +184,8 @@
   border-radius: var(--shape-lg);
   overflow: hidden;
   max-height: 360px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--glass-border);
 }
 
 .previewImg {
