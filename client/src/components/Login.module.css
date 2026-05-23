@@ -168,8 +168,8 @@
 .authTabs {
   display: flex;
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: 100px;
   padding: 4px;
   margin-bottom: 24px;
@@ -179,26 +179,30 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-medium);
   padding: 12px 0;
   font-size: 14px;
   font-weight: 600;
   border-radius: 100px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--duration-short) var(--ease-expressive);
+}
+
+.authTab:hover {
+  color: var(--text-high);
 }
 
 .activeAuthTab {
   flex: 1;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: var(--md-primary-container);
+  border: 1px solid rgba(0, 229, 204, 0.2);
+  color: var(--md-primary);
   padding: 12px 0;
   font-size: 14px;
   font-weight: 700;
   border-radius: 100px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 229, 204, 0.08);
 }
 
 .traditionalForm {
@@ -280,7 +284,7 @@
 .dividerLine {
   flex-grow: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--glass-border);
 }
 
 .dividerText {
@@ -288,7 +292,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: rgba(255, 255, 255, 0.38); /* textLow */
+  color: var(--text-low);
   font-weight: 600;
 }
 
@@ -354,7 +358,7 @@
 
 .footerNote {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-low);
   line-height: 1.4;
   margin-top: 12px;
 }
