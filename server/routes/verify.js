@@ -8,6 +8,7 @@ const { factCheckClaim } = require('../services/geminiAgent');
 const { searchPubMed } = require('../services/pubmedService');
 const { searchClinicalTrials } = require('../services/clinicalTrialsService');
 const { searchFdaAlerts } = require('../services/openFdaService');
+const zdrScrubber = require('../utils/zdrScrubber');
 
 // Multer in-memory storage configuration
 const storage = multer.memoryStorage();
@@ -82,6 +83,9 @@ router.post('/verify', handleUpload, async (req, res) => {
           : ocrText;
       }
     }
+
+    // Run Zero-Data-Retention (ZDR) PHI Scrubber pass before validation or dispatch
+    claimText = zdrScrubber.scrub(claimText);
 
     // Validate we have something to check
     if (!claimText) {
