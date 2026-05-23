@@ -460,8 +460,8 @@
 }
 
 .inputLabel {
-  font-[10px];
-  font-mono;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
   color: var(--text-medium);
   letter-spacing: 0.05em;
