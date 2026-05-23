@@ -125,7 +125,13 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
         body: JSON.stringify({ credential: response.credential })
       });
 
-      const data = await res.json();
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        throw new Error(`Server returned invalid response (Status ${res.status}). Verify your backend server is running.`);
+      }
+
       if (!res.ok) {
         throw new Error(data.error || 'Failed to authenticate with backend');
       }
@@ -150,7 +156,14 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      const data = await res.json();
+
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        throw new Error(`Server returned invalid response (Status ${res.status}). Verify your backend server is running.`);
+      }
+
       if (!res.ok) throw new Error(data.error || 'Authentication failed');
       onLoginSuccess(data.user, data.token);
     } catch (err) {
