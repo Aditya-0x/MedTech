@@ -1,17 +1,73 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import styles from './Login.module.css';
 
+// Register GSAP plugins safely
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
+  const containerRef = useRef(null);
+  const scrollSectionRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
-  // Traditional Auth State
   const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
+  // 1. Initialize GSAP ScrollTrigger for horizontal scroll mechanics
+  useEffect(() => {
+    const container = containerRef.current;
+    const scrollSection = scrollSectionRef.current;
+
+    if (!container || !scrollSection) return;
+
+    // Calculate maximum horizontal travel distance
+    const totalScrollWidth = scrollSection.offsetWidth - window.innerWidth;
+
+    let pinTrigger;
+
+    // Timeout ensures DOM layout is fully computed before mapping trigger boundaries
+    const initScrollTrigger = () => {
+      pinTrigger = ScrollTrigger.create({
+        trigger: container,
+        pin: true,
+        scrub: 1,
+        start: 'top top',
+        end: () => `+=${scrollSection.offsetWidth}`,
+        onUpdate: (self) => {
+          // Translate the slider element horizontally based on scroll progress
+          gsap.set(scrollSection, { x: -self.progress * totalScrollWidth });
+        },
+        invalidateOnRefresh: true,
+      });
+
+      // Micro-animations for typography reveal on load
+      gsap.fromTo(
+        `.${styles.revealText}`,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          stagger: 0.2,
+          ease: 'power3.out',
+        }
+      );
+    };
+
+    const timer = setTimeout(initScrollTrigger, 100);
+
+    // Strict cleanup to release viewport lock on route unmount
+    return () => {
+      clearTimeout(timer);
+      if (pinTrigger) pinTrigger.kill();
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
+  }, []);
+
+  // 2. Initialize Google Sign-in API GSI
   useEffect(() => {
     const clientIdEnv = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1047648356984-mockclientid.apps.googleusercontent.com';
-
     const scriptId = 'google-gsi-client';
     const existingScript = document.getElementById(scriptId);
 
@@ -55,7 +111,6 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
       };
       document.body.appendChild(script);
     } else {
-      // Script already loaded, wait a short tick to ensure it parsed
       setTimeout(initGoogleSignIn, 100);
     }
   }, []);
@@ -106,7 +161,8 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
   };
 
   return (
-    <div className={styles.container}>
+    <div ref={containerRef} className={styles.scrollContainer}>
+      
       {/* Floating Theme Toggle */}
       <button 
         className={styles.themeToggleFloating} 
@@ -129,121 +185,172 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
         )}
       </button>
 
+      {/* Floating Top Header Overlay */}
+      <header className={styles.headerOverlay}>
+        <div className={styles.headerBrand}>
+          <span className={styles.headerIcon}>🏥</span>
+          <h2 className={styles.headerTitle}>MED-VERIFY PRO</h2>
+        </div>
+        <div className={styles.headerMeta}>
+          <span className={styles.headerTag}>HIPAA SECURED</span>
+          <span className={styles.headerBadge}>M1 HPR Verified</span>
+        </div>
+      </header>
+
       {/* Dynamic Ambient Background Mesh */}
       <div className={styles.meshBackdrop}>
         <div className={`${styles.glowCircle} ${styles.cyanCircle}`} />
         <div className={`${styles.glowCircle} ${styles.purpleCircle}`} />
       </div>
 
-      <div className={styles.loginCard}>
-        {/* Top refraction edge glow */}
-        <div className={styles.refractionEdge} />
-
-        <div className={styles.brand}>
-          <div className={styles.logoIcon}>
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#grad1)"/>
-              <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#grad1)"/>
-              <circle cx="28" cy="28" r="10" fill="#07060f"/>
-              <circle cx="28" cy="28" r="9" fill="url(#grad2)"/>
-              <path d="M24 28.5l2.5 2.5 5-5" stroke="#07060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <defs>
-                <linearGradient id="grad1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#00e5cc"/>
-                  <stop offset="1" stopColor="#b388ff"/>
-                </linearGradient>
-                <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#00e5cc"/>
-                  <stop offset="1" stopColor="#5df5c0"/>
-                </linearGradient>
-              </defs>
-            </svg>
+      {/* Horizontally scrolling slides */}
+      <div ref={scrollSectionRef} className={styles.scrollTrack}>
+        
+        {/* Slide 1: Welcome & Mission narrative */}
+        <section className={styles.slideSection}>
+          <div className={styles.narrativeBlock}>
+            <span className={styles.slideNumber}>01 // System Infrastructure</span>
+            <h2 className={`${styles.revealText} ${styles.slideTitle}`}>
+              Democratizing <br />
+              <span className={styles.gradientText}>Clinical Veracity</span>
+            </h2>
+            <p className={`${styles.revealText} ${styles.slideDesc}`}>
+              Synthesizing real-time science indices across global and national channels (WHO, PubMed, ClinicalTrials, OpenFDA) to neutralize medical misinformation instantly.
+            </p>
           </div>
-          <h1 className={styles.brandTitle}>Med-Verify <span className={styles.proBadge}>PRO</span></h1>
-          <p className={styles.brandSubtitle}>Clinical Synthesis & Literature Evidence Engine</p>
-        </div>
+          <div className={styles.scrollIndicator}>
+            Scroll down to explore onboarding track →
+          </div>
+        </section>
 
-        <div className={styles.infoBanner}>
-          🔬 Built for <strong>NBEC 2026</strong>. Auto-synthesize claims against peer-reviewed PubMed articles, ongoing clinical studies, and FDA drug recall logs.
-        </div>
+        {/* Slide 2: Interoperability Showcase */}
+        <section className={`${styles.slideSection} ${styles.darkSlide}`}>
+          <div className={styles.narrativeBlock}>
+            <span className={styles.slideNumber}>02 // Interoperability standards</span>
+            <h2 className={styles.slideTitle}>
+              Integrated with <br />
+              <span className={styles.gradientText}>ABDM Protocols</span>
+            </h2>
+            <p className={styles.slideDesc}>
+              Fully compliant with India's Ayushman Bharat Digital Mission (ABDM). Seamlessly maps diagnostic claims into FHIR R4 document bundles with SNOMED-CT terminology integration.
+            </p>
+          </div>
+        </section>
 
-        {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
+        {/* Slide 3: Interactive Glass-morphic Access Card */}
+        <section className={styles.slideSection}>
+          <div className={styles.loginCard}>
+            {/* Top refraction edge glow */}
+            <div className={styles.refractionEdge} />
 
-        <div className={styles.authActions}>
-          {loading ? (
-            <div className={styles.authLoading}>
-              <div className={styles.spinner} />
-              <span>Initializing secure session...</span>
+            <div className={styles.brand}>
+              <div className={styles.logoIcon}>
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#grad1)"/>
+                  <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#grad1)"/>
+                  <circle cx="28" cy="28" r="10" fill="#07060f"/>
+                  <circle cx="28" cy="28" r="9" fill="url(#grad2)"/>
+                  <path d="M24 28.5l2.5 2.5 5-5" stroke="#07060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <defs>
+                    <linearGradient id="grad1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#00e5cc"/>
+                      <stop offset="1" stopColor="#b388ff"/>
+                    </linearGradient>
+                    <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop stopColor="#00e5cc"/>
+                      <stop offset="1" stopColor="#5df5c0"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h1 className={styles.brandTitle}>Med-Verify <span className={styles.proBadge}>PRO</span></h1>
+              <p className={styles.brandSubtitle}>Clinical Synthesis & Literature Evidence Engine</p>
             </div>
-          ) : (
-            <>
-              {/* Traditional Auth Form */}
-              <div className={styles.authTabs}>
-                <button 
-                  type="button"
-                  className={authMode === 'login' ? styles.activeAuthTab : styles.authTab} 
-                  onClick={() => setAuthMode('login')}
-                >
-                  Sign In
-                </button>
-                <button 
-                  type="button"
-                  className={authMode === 'signup' ? styles.activeAuthTab : styles.authTab} 
-                  onClick={() => setAuthMode('signup')}
-                >
-                  Create Account
-                </button>
-              </div>
 
-              <form onSubmit={handleTraditionalAuth} className={styles.traditionalForm}>
-                {authMode === 'signup' && (
-                  <input 
-                    type="text" 
-                    placeholder="Full Name" 
-                    className={styles.authInput}
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required 
-                  />
-                )}
-                <input 
-                  type="email" 
-                  placeholder="Email Address" 
-                  className={styles.authInput}
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  required 
-                />
-                <input 
-                  type="password" 
-                  placeholder="Password" 
-                  className={styles.authInput}
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  required 
-                />
-                <button type="submit" className={styles.submitAuthBtn}>
-                  {authMode === 'login' ? 'Sign In ➔' : 'Create Account ➔'}
-                </button>
-              </form>
+            <div className={styles.infoBanner}>
+              🔬 Built for <strong>NBEC 2026</strong>. Auto-synthesize claims against peer-reviewed PubMed articles, ongoing clinical studies, and FDA drug recall logs.
+            </div>
 
-              <div className={styles.divider}>
-                <span className={styles.dividerLine} />
-                <span className={styles.dividerText}>or continue with</span>
-                <span className={styles.dividerLine} />
-              </div>
+            {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
 
-              {/* Google Sign In Target */}
-              <div className={styles.googleContainer}>
-                <div id="google-signin-btn-container" className={styles.googleBtn} />
-              </div>
-            </>
-          )}
-        </div>
+            <div className={styles.authActions}>
+              {loading ? (
+                <div className={styles.authLoading}>
+                  <div className={styles.spinner} />
+                  <span>Initializing secure session...</span>
+                </div>
+              ) : (
+                <>
+                  {/* Traditional Auth Form */}
+                  <div className={styles.authTabs}>
+                    <button 
+                      type="button"
+                      className={authMode === 'login' ? styles.activeAuthTab : styles.authTab} 
+                      onClick={() => setAuthMode('login')}
+                    >
+                      Sign In
+                    </button>
+                    <button 
+                      type="button"
+                      className={authMode === 'signup' ? styles.activeAuthTab : styles.authTab} 
+                      onClick={() => setAuthMode('signup')}
+                    >
+                      Create Account
+                    </button>
+                  </div>
 
-        <div className={styles.footerNote}>
-          🔒 Secure OAuth authorization. Production ready.
-        </div>
+                  <form onSubmit={handleTraditionalAuth} className={styles.traditionalForm}>
+                    {authMode === 'signup' && (
+                      <input 
+                        type="text" 
+                        placeholder="Full Name" 
+                        className={styles.authInput}
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        required 
+                      />
+                    )}
+                    <input 
+                      type="email" 
+                      placeholder="Email Address" 
+                      className={styles.authInput}
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      required 
+                    />
+                    <input 
+                      type="password" 
+                      placeholder="Password" 
+                      className={styles.authInput}
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      required 
+                    />
+                    <button type="submit" className={styles.submitAuthBtn}>
+                      {authMode === 'login' ? 'Sign In ➔' : 'Create Account ➔'}
+                    </button>
+                  </form>
+
+                  <div className={styles.divider}>
+                    <span className={styles.dividerLine} />
+                    <span className={styles.dividerText}>or continue with</span>
+                    <span className={styles.dividerLine} />
+                  </div>
+
+                  {/* Google Sign In Target */}
+                  <div className={styles.googleContainer}>
+                    <div id="google-signin-btn-container" className={styles.googleBtn} />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className={styles.footerNote}>
+              🔒 Secure OAuth authorization. Production ready.
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
   );
