@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const { authenticateToken } = require('./auth');
 const History = require('../models/History');
 const User = require('../models/User');
@@ -15,7 +16,11 @@ router.get('/history', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
-    if (!process.env.MONGO_URI) {
+    // Check if Mongo is connected. If not, fallback to in-memory store
+    const isMongoConnected = mongoose.connection.readyState === 1;
+
+    if (!process.env.MONGO_URI || !isMongoConnected) {
+      console.warn('⚠️ MongoDB not connected. Serving history from in-memory fallback store.');
       const history = userHistoryFallback.get(userId) || [];
       return res.json({ success: true, history });
     }
@@ -23,7 +28,10 @@ router.get('/history', authenticateToken, async (req, res) => {
     const history = await History.find({ userId }).sort({ savedAt: -1 }).limit(50);
     res.json({ success: true, history });
   } catch (err) {
-    res.status(500).json({ error: 'Server error retrieving history' });
+    console.error('⚠️ Error fetching history, falling back to memory:', err.message);
+    const userId = req.user?.id;
+    const history = userId ? (userHistoryFallback.get(userId) || []) : [];
+    res.json({ success: true, history });
   }
 });
 
@@ -47,7 +55,9 @@ router.post('/history', authenticateToken, async (req, res) => {
       savedAt: new Date().toISOString()
     };
 
-    if (!process.env.MONGO_URI) {
+    const isMongoConnected = mongoose.connection.readyState === 1;
+
+    if (!process.env.MONGO_URI || !isMongoConnected) {
       if (!userHistoryFallback.has(userId)) userHistoryFallback.set(userId, []);
       const history = userHistoryFallback.get(userId);
       history.unshift(enrichedReport);
@@ -89,8 +99,27 @@ router.post('/history', authenticateToken, async (req, res) => {
 
     res.json({ success: true, report: enrichedReport, pointsAwarded: POINTS_REWARD, newTotalPoints: user ? user.points : 0 });
   } catch (err) {
-    console.error('❌ Error saving history:', err);
-    res.status(500).json({ error: 'Server error saving history', details: err.message });
+    console.error('❌ Error saving history, falling back to memory:', err);
+    try {
+      const userId = req.user.id;
+      const { report } = req.body;
+      const POINTS_REWARD = 15;
+      const enrichedReport = {
+        ...report,
+        id: report?.id || `rep-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        savedAt: new Date().toISOString()
+      };
+      if (!userHistoryFallback.has(userId)) userHistoryFallback.set(userId, []);
+      const history = userHistoryFallback.get(userId);
+      history.unshift(enrichedReport);
+      if (history.length > 50) history.pop();
+      userHistoryFallback.set(userId, history);
+      const simulatedNewPoints = (req.user.points || 0) + POINTS_REWARD;
+      req.user.points = simulatedNewPoints;
+      return res.json({ success: true, report: enrichedReport, pointsAwarded: POINTS_REWARD, newTotalPoints: simulatedNewPoints });
+    } catch (fallbackErr) {
+      res.status(500).json({ error: 'Server error saving history', details: err.message });
+    }
   }
 });
 
@@ -103,7 +132,9 @@ router.delete('/history/:id', authenticateToken, async (req, res) => {
     const userId = req.user.id;
     const reportId = req.params.id;
 
-    if (!process.env.MONGO_URI) {
+    const isMongoConnected = mongoose.connection.readyState === 1;
+
+    if (!process.env.MONGO_URI || !isMongoConnected) {
       const history = userHistoryFallback.get(userId) || [];
       const updatedHistory = history.filter(r => r.id !== reportId);
       userHistoryFallback.set(userId, updatedHistory);
@@ -113,7 +144,15 @@ router.delete('/history/:id', authenticateToken, async (req, res) => {
     await History.findOneAndDelete({ _id: reportId, userId });
     res.json({ success: true, message: 'Report successfully deleted from your history' });
   } catch (err) {
-    res.status(500).json({ error: 'Server error deleting history' });
+    console.error('❌ Error deleting history, falling back to memory:', err);
+    const userId = req.user?.id;
+    const reportId = req.params.id;
+    if (userId) {
+      const history = userHistoryFallback.get(userId) || [];
+      const updatedHistory = history.filter(r => r.id !== reportId);
+      userHistoryFallback.set(userId, updatedHistory);
+    }
+    res.json({ success: true, message: 'Report successfully removed from your sandbox' });
   }
 });
 
