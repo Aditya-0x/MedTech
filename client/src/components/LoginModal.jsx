@@ -189,9 +189,9 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
       badge: '01 // SYSTEM PLATFORM'
     },
     {
-      title: 'AYUSHMAN BHARAT Interoperable',
-      desc: 'Aligned with India\'s Ayushman Bharat Digital Mission (ABDM). Supports FHIR Document bundles and SNOMED-CT clinical terminology mapping protocols.',
-      badge: '02 // STANDARDS COMPLIANCE'
+      title: 'Deep-Science Synthesis Engine',
+      desc: 'Harnesses real-time search synthesis algorithms to cross-reference multi-layered research data and output authoritative clinical verification indexes.',
+      badge: '02 // COGNITIVE ARCHITECTURE'
     },
     {
       title: 'Zero-Data-Retention Security',
@@ -392,12 +392,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
               className={styles.toggleSlidesBtn} 
               onClick={() => setShowSlides(true)}
             >
-              📖 View ABDM & Platform Specifications
+              📖 View System & Platform Specifications
             </button>
           )}
 
           <div className={styles.footerNote}>
-            🔒 HIPAA & ABDM secured. Zero data retention policies active.
+            🔒 HIPAA secured. Zero data retention policies active.
           </div>
         </div>
       </div>

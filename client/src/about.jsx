@@ -66,7 +66,7 @@ function AboutPage() {
           <p className={styles.footerText}>
             © 2026 Med-Verify Systems, Inc. All rights reserved. 
             Synthesizing secure, authoritative clinical data from WHO, PubMed, and FDA. 
-            All clinical verification pipelines are compliant under Ayushman Bharat Digital Mission (ABDM) and HIPAA guidelines.
+            All clinical verification pipelines are compliant under HIPAA guidelines.
           </p>
           <div className={styles.footerSection}>
             <strong>Platform</strong>

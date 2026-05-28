@@ -236,16 +236,16 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
           </div>
         </section>
 
-        {/* Slide 2: Interoperability Showcase */}
+        {/* Slide 2: Scientific Synthesis Showcase */}
         <section className={`${styles.slideSection} ${styles.darkSlide}`}>
           <div className={styles.narrativeBlock}>
-            <span className={styles.slideNumber}>02 // Interoperability standards</span>
+            <span className={styles.slideNumber}>02 // Cognitive Architecture</span>
             <h2 className={styles.slideTitle}>
-              Integrated with <br />
-              <span className={styles.gradientText}>ABDM Protocols</span>
+              Powered by <br />
+              <span className={styles.gradientText}>Deep-Science Synthesis</span>
             </h2>
             <p className={styles.slideDesc}>
-              Fully compliant with India's Ayushman Bharat Digital Mission (ABDM). Seamlessly maps diagnostic claims into FHIR R4 document bundles with SNOMED-CT terminology integration.
+              Harnesses real-time search synthesis algorithms to cross-reference multi-layered research data and output authoritative clinical verification indexes.
             </p>
           </div>
         </section>

@@ -46,7 +46,7 @@ export default function Contact() {
             <span className={styles.gradientText}>Aditya Verma</span>
           </h1>
           <p className={styles.desc}>
-            Have questions about Med-Verify Pro's technology stack, ABDM standards compatibility, or HIPAA privacy implementations? Submit a message below or contact us directly.
+            Have questions about Med-Verify Pro's technology stack, health database integrations, or HIPAA privacy implementations? Submit a message below or contact us directly.
           </p>
 
           <div className={styles.contactDetails}>

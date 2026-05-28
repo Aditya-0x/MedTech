@@ -425,7 +425,7 @@ export default function App() {
                 <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed</a>,{' '}
                 <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov</a>,{' '}
                 and <a href="https://open.fda.gov/" target="_blank" rel="noopener noreferrer">OpenFDA</a>. 
-                All clinical verification pipelines are compliant under Ayushman Bharat Digital Mission (ABDM) and HIPAA guidelines.
+                All clinical verification pipelines are compliant under HIPAA guidelines.
               </p>
               <div className={styles.footerSection}>
                 <strong>Platform</strong>

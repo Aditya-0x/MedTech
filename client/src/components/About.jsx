@@ -58,7 +58,7 @@ export default function About() {
             <div className={styles.badgeRow}>
               <span className={styles.profileBadge}>💻 Full-Stack Engineer</span>
               <span className={styles.profileBadge}>🔬 Clinical Informatics</span>
-              <span className={styles.profileBadge}>🛡️ HIPAA & ABDM Specialist</span>
+              <span className={styles.profileBadge}>🛡️ HIPAA Security Specialist</span>
             </div>
           </div>
         </div>
@@ -83,10 +83,10 @@ export default function About() {
             </p>
           </div>
           <div className={styles.infraCard}>
-            <div className={styles.infraIcon}>🔌</div>
-            <h3 className={styles.infraTitle}>ABDM Interoperability</h3>
+            <div className={styles.infraIcon}>⚡</div>
+            <h3 className={styles.infraTitle}>Scientific Synthesis Engine</h3>
             <p className={styles.infraDesc}>
-              Fully compliant with India\'s Ayushman Bharat Digital Mission (ABDM). Features robust mapping compatibility to generate FHIR R4 clinical bundles and SNOMED-CT dictionary indices.
+              Integrates deep clinical fact-checking pipelines with advanced semantic classification models to render highly authoritative medical, chemical, and nutritional claim verdicts.
             </p>
           </div>
         </div>
