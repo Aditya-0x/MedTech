@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Otp = require('../models/Otp');
 const { ensureDbConnected } = require('../config/db');
 const { sendWelcomeEmail, sendOtpEmail, sendContactEmail } = require('../services/emailService');
 const mongoose = require('mongoose');
@@ -62,7 +63,13 @@ router.post('/auth/send-otp', async (req, res) => {
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    otps.set(email.toLowerCase(), { otp: otpCode, expiresAt });
+    if (dbOnline) {
+      // Purge any existing codes for this user to avoid duplication
+      await Otp.deleteMany({ email: email.toLowerCase() });
+      await Otp.create({ email: email.toLowerCase(), otp: otpCode });
+    } else {
+      otps.set(email.toLowerCase(), { otp: otpCode, expiresAt });
+    }
     console.log(`🔑 OTP generated for ${email}: ${otpCode}`);
 
     // Send email with OTP
@@ -90,25 +97,33 @@ router.post('/auth/verify-otp', async (req, res) => {
     }
 
     const emailKey = email.toLowerCase();
-    const otpEntry = otps.get(emailKey);
-
-    if (!otpEntry) {
-      return res.status(400).json({ error: 'No verification request found for this email. Please request a new code.' });
-    }
-
-    if (otpEntry.otp !== otp.trim()) {
-      return res.status(400).json({ error: 'Invalid verification code. Please check your email and try again.' });
-    }
-
-    if (Date.now() > otpEntry.expiresAt) {
-      otps.delete(emailKey);
-      return res.status(400).json({ error: 'Verification code has expired. Please request a new one.' });
-    }
-
-    // Correct OTP verified! Remove it.
-    otps.delete(emailKey);
-
     const dbOnline = await ensureDbConnected();
+
+    let otpVerified = false;
+
+    if (dbOnline) {
+      const otpDoc = await Otp.findOne({ email: emailKey });
+      if (otpDoc && otpDoc.otp === otp.trim()) {
+        otpVerified = true;
+        // Purge the used code immediately
+        await Otp.deleteOne({ _id: otpDoc._id });
+      }
+    }
+
+    // Fallback to local memory map verification if database did not have it
+    if (!otpVerified) {
+      const otpEntry = otps.get(emailKey);
+      if (otpEntry) {
+        if (otpEntry.otp === otp.trim() && Date.now() <= otpEntry.expiresAt) {
+          otpVerified = true;
+          otps.delete(emailKey);
+        }
+      }
+    }
+
+    if (!otpVerified) {
+      return res.status(400).json({ error: 'Invalid or expired verification code. Please check your email and try again.' });
+    }
 
     if (!dbOnline) {
       console.warn('⚠️ MongoDB is offline. Generating mock user session for testing.');
