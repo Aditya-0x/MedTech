@@ -1,6 +1,6 @@
 # Med-Verify Pro 🩺
 
-Med-Verify Pro is a premium, modern, AI-powered clinical fact-checking and synthesis platform built to fight medical misinformation. The application extracts clinical claims from text or screenshots, cross-references them against multiple authoritative scientific databases, and employs advanced reasoning through Gemini Frontier Models to provide comprehensive, sourced verdicts.
+Med-Verify Pro is a premium, modern, AI-powered clinical fact-checking and evidence-synthesis SaaS platform built to fight medical misinformation. The application extracts clinical claims from text or screenshots, scrubs Personal Health Information (PHI) to guarantee HIPAA compliance, cross-references them against multiple authoritative scientific databases, and employs advanced reasoning through Gemini Frontier Models to provide comprehensive, sourced verdicts.
 
 ---
 
@@ -15,18 +15,26 @@ Med-Verify Pro is a premium, modern, AI-powered clinical fact-checking and synth
     3.  **PubMed:** For peer-reviewed medical and scientific literature.
     4.  **ClinicalTrials.gov:** For ongoing and completed clinical research registries.
     5.  **OpenFDA:** For official pharmaceutical safety alerts, recalls, and warnings.
-*   **Dual-Authentication Methods:** Fully supported secure signups/logins through standard Email/Password (using bcrypt hashing & JWT sessions) and native **Google OAuth 2.0 Single Sign-In**.
-*   **Production MongoDB Integration:** Fully persistent user accounts, clinical history logs, and scoring statistics backed by Mongoose and MongoDB Atlas.
-*   **Gamification Engine:** Users earn **✨ +15 Points** for each claim verified, encouraging user engagement with a live badge showing points in real time.
-*   **Email Notification Delivery:** Beautiful, automated HTML welcome emails dispatched via Nodemailer using secure SMTP relays.
+*   **Elite Multi-Page Navigation Architecture:**
+    *   Features standalone SEO-optimized bundles for `/about.html` (**About Creator**) and `/contact.html` (**Support Portal**) dynamically compiled via Vite and Rollup.
+    *   Cross-page sessions (`medverify_user`) and color theme choices (`medverify_theme`) are synchronized natively via fast `localStorage` listeners on page mounts.
+*   **Unified Glassmorphic Header Menu:**
+    *   Entire platform navigation fits inside a single, sticky liquid-glass topbar containing **Verify**, **History**, **About**, and **Support** tabs.
+    *   Fully engineered with clamp-based paddings and `white-space: nowrap;` to prevent button height wrapping, maintaining mathematically perfect visual symmetry and zero layout overlaps on any viewport aspect ratio.
+*   **ABDM & HIPAA Zero-Data Retention Compliance:**
+    *   Scrubbing engine intercepts PHI before routing queries to external API endpoints.
+    *   Fully maps diagnostic metrics to generate interoperable FHIR R4 bundles and SNOMED-CT dictionary entries under Ayushman Bharat Digital Mission (ABDM) standards.
+*   **Gamification & SMTP Welcomes:**
+    *   Users earn **✨ +15 Points** on their real-time points badge for each claim verified.
+    *   Secure, passwordless OTP sign-ins with beautiful automated HTML welcoming letters dispatched via Nodemailer using secure SMTP relays.
 
 ---
 
 ## 🛠️ Tech Stack
 
-*   **Frontend:** React, Vite, Vanilla CSS Modules, Google OAuth SDK
+*   **Frontend:** React, Vite, Rollup, Vanilla CSS Modules, Google OAuth SDK
 *   **Backend:** Node.js, Express, Mongoose (MongoDB Atlas), Nodemailer, Multer
-*   **AI & OCR Engine:** Google Gemini (Generative AI SDK), Mistral AI API
+*   **AI & OCR Engine:** Google Gemini (Generative AI REST Fallback Agent), Mistral AI API
 *   **Design Paradigm:** Premium Liquid Glass & Material Expressive theme styles
 
 ---
