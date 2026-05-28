@@ -57,7 +57,7 @@ const VERDICT_CONFIG = {
   }
 };
 
-export default function ResultCard({ result, onReset, isAuthenticated, isSaved, onSave }) {
+export default function ResultCard({ result, onReset, isAuthenticated, isSaved, onSave, onSignInRequired }) {
   const [ocrExpanded, setOcrExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('analysis');
 
@@ -98,7 +98,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
             
             {/* Action Banner buttons */}
             <div className={styles.bannerActions}>
-              {isAuthenticated && (
+              {isAuthenticated ? (
                 <button
                   type="button"
                   className={`${styles.actionBtnMini} ${isSaved ? styles.actionBtnMiniSaved : ''}`}
@@ -107,6 +107,15 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
                   id="save-history-btn"
                 >
                   {isSaved ? '✓ Saved to History' : '📥 Save to History'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.actionBtnMini}
+                  onClick={onSignInRequired}
+                  id="save-history-guest-btn"
+                >
+                  📥 Save to History (Sign In)
                 </button>
               )}
               <button 

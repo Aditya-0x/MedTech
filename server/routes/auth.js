@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { sendWelcomeEmail } = require('../services/emailService');
+const { sendWelcomeEmail, sendOtpEmail, sendContactEmail } = require('../services/emailService');
 const mongoose = require('mongoose');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_development';
+
+// In-memory OTP store (email -> { otp, expiresAt })
+const otps = new Map();
 
 // Helper to decode JWT from Google
 function decodeJwt(token) {
@@ -28,74 +30,132 @@ const generateToken = (user) => {
 };
 
 /**
- * POST /api/auth/signup
+ * POST /api/auth/send-otp
+ * Body: { email }
  */
-router.post('/auth/signup', async (req, res) => {
+router.post('/auth/send-otp', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Please provide all required fields' });
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email address is required' });
     }
 
-    // Since MONGO_URI might not be present, or database connection is offline (e.g. Atlas ECONNREFUSED)
-    if (!process.env.MONGO_URI || mongoose.connection.readyState !== 1) {
-      console.warn('⚠️ MongoDB is offline. Registering mock user session for testing resilience.');
-      const mockUser = { _id: 'mock-id-new', name, email, points: 0, picture: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop&q=80' };
-      const token = generateToken(mockUser);
-      return res.json({ success: true, token, user: mockUser });
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address' });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email is already registered' });
+    // Check if user is offline or online
+    const dbOnline = process.env.MONGO_URI && mongoose.connection.readyState === 1;
+    let existingUser = false;
+    if (dbOnline) {
+      const user = await User.findOne({ email: email.toLowerCase() });
+      existingUser = !!user;
+    } else {
+      // In sandbox mode/offline mode, pretend user exists if it contains sandbox
+      existingUser = email.toLowerCase().includes('sandbox') || email.toLowerCase().includes('test');
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Generate secure 6-digit OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword
-    });
+    otps.set(email.toLowerCase(), { otp: otpCode, expiresAt });
+    console.log(`🔑 OTP generated for ${email}: ${otpCode}`);
 
-    // Send Welcome Email securely and await it so it completes fully in serverless (Vercel) environments
-    await sendWelcomeEmail(user.email, user.name);
+    // Send email with OTP
+    const emailSent = await sendOtpEmail(email, otpCode);
+    if (!emailSent) {
+      return res.status(500).json({ error: 'Failed to send verification code. Please try again.' });
+    }
 
-    const token = generateToken(user);
-    res.status(201).json({ success: true, token, user: { id: user._id, name: user.name, email: user.email, points: user.points, picture: user.picture } });
+    res.json({ success: true, isNewUser: !existingUser, message: 'Verification code sent!' });
   } catch (err) {
-    res.status(500).json({ error: 'Server error during signup' });
+    console.error('❌ Send OTP error:', err.message);
+    res.status(500).json({ error: 'Server error while sending verification code' });
   }
 });
 
 /**
- * POST /api/auth/login
+ * POST /api/auth/verify-otp
+ * Body: { email, otp, name }
  */
-router.post('/auth/login', async (req, res) => {
+router.post('/auth/verify-otp', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    
-    if (!process.env.MONGO_URI || mongoose.connection.readyState !== 1) {
-      console.warn('⚠️ MongoDB is offline. Serving mock sandbox login session.');
-      const mockUser = { _id: 'mock-id-123', name: 'Sandbox User', email, points: 0, picture: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop&q=80' };
-      return res.json({ success: true, token: generateToken(mockUser), user: mockUser });
+    const { email, otp, name } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ error: 'Email and verification code are required' });
     }
 
-    const user = await User.findOne({ email });
-    if (!user || !user.password) {
-      return res.status(400).json({ error: 'Invalid email or password' });
+    const emailKey = email.toLowerCase();
+    const otpEntry = otps.get(emailKey);
+
+    if (!otpEntry) {
+      return res.status(400).json({ error: 'No verification request found for this email. Please request a new code.' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid email or password' });
+    if (otpEntry.otp !== otp.trim()) {
+      return res.status(400).json({ error: 'Invalid verification code. Please check your email and try again.' });
+    }
+
+    if (Date.now() > otpEntry.expiresAt) {
+      otps.delete(emailKey);
+      return res.status(400).json({ error: 'Verification code has expired. Please request a new one.' });
+    }
+
+    // Correct OTP verified! Remove it.
+    otps.delete(emailKey);
+
+    const dbOnline = process.env.MONGO_URI && mongoose.connection.readyState === 1;
+
+    if (!dbOnline) {
+      console.warn('⚠️ MongoDB is offline. Generating mock user session for testing.');
+      const mockUser = {
+        _id: 'mock-id-' + Math.floor(Math.random() * 10000),
+        name: name || 'Sandbox Clinician',
+        email: emailKey,
+        points: 0,
+        picture: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop&q=80'
+      };
+      const token = generateToken(mockUser);
+      return res.json({ success: true, token, user: mockUser });
+    }
+
+    // Find or create the user in MongoDB
+    let user = await User.findOne({ email: emailKey });
+    let isNewUser = false;
+
+    if (!user) {
+      if (!name) {
+        return res.status(400).json({ error: 'Profile name is required to complete registration.' });
+      }
+      user = await User.create({
+        name: name.trim(),
+        email: emailKey,
+        points: 0
+      });
+      isNewUser = true;
+      // Send welcome email
+      await sendWelcomeEmail(user.email, user.name);
     }
 
     const token = generateToken(user);
-    res.json({ success: true, token, user: { id: user._id, name: user.name, email: user.email, points: user.points, picture: user.picture } });
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        points: user.points,
+        picture: user.picture
+      }
+    });
+
   } catch (err) {
-    res.status(500).json({ error: 'Server error during login' });
+    console.error('❌ Verify OTP error:', err.message);
+    res.status(500).json({ error: 'Server error during verification' });
   }
 });
 
@@ -182,6 +242,35 @@ router.get('/auth/me', authenticateToken, async (req, res) => {
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
   res.json({ success: true, user: { id: user._id, name: user.name, email: user.email, points: user.points, picture: user.picture } });
+});
+
+/**
+ * POST /api/contact
+ * Body: { name, email, subject, message }
+ */
+router.post('/contact', async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body;
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Please enter a valid email address' });
+    }
+
+    const emailSent = await sendContactEmail(name, email, subject, message);
+    if (!emailSent) {
+      return res.status(500).json({ error: 'Failed to submit contact request. Please try again.' });
+    }
+
+    res.json({ success: true, message: 'Message sent successfully!' });
+  } catch (err) {
+    console.error('❌ Contact route error:', err.message);
+    res.status(500).json({ error: 'Server error while sending feedback' });
+  }
 });
 
 module.exports = {

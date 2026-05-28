@@ -1,15 +1,15 @@
 import React from 'react';
 import styles from './Header.module.css';
 
-export default function Header({ user, activeView, onViewChange, onLogout, showHero, theme, onToggleTheme }) {
+export default function Header({ user, activeView, onViewChange, onLogout, showHero, theme, onToggleTheme, onSignInClick }) {
   return (
     <header className={styles.header}>
       {/* Top bar */}
       <div className={styles.topBar}>
         <div 
           className={styles.logo} 
-          onClick={() => user && onViewChange('verify')} 
-          style={{ cursor: user ? 'pointer' : 'default' }}
+          onClick={() => onViewChange('verify')} 
+          style={{ cursor: 'pointer' }}
         >
           <div className={styles.logoIcon}>
             <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,22 +38,32 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
           </div>
         </div>
 
-        {user && (
-          <nav className={styles.navigation}>
-            <button
-              className={`${styles.navTab} ${activeView === 'verify' ? styles.activeTab : ''}`}
-              onClick={() => onViewChange('verify')}
-            >
-              🔬 Verify Claim
-            </button>
-            <button
-              className={`${styles.navTab} ${activeView === 'history' ? styles.activeTab : ''}`}
-              onClick={() => onViewChange('history')}
-            >
-              📊 Clinical History
-            </button>
-          </nav>
-        )}
+        <nav className={styles.navigation}>
+          <button
+            className={`${styles.navTab} ${activeView === 'verify' ? styles.activeTab : ''}`}
+            onClick={() => onViewChange('verify')}
+          >
+            🔬 Verify
+          </button>
+          <button
+            className={`${styles.navTab} ${activeView === 'history' ? styles.activeTab : ''}`}
+            onClick={() => user ? onViewChange('history') : onSignInClick()}
+          >
+            📊 History {!user && '🔒'}
+          </button>
+          <button
+            className={`${styles.navTab} ${activeView === 'about' ? styles.activeTab : ''}`}
+            onClick={() => onViewChange('about')}
+          >
+            👨‍⚕️ About
+          </button>
+          <button
+            className={`${styles.navTab} ${activeView === 'contact' ? styles.activeTab : ''}`}
+            onClick={() => onViewChange('contact')}
+          >
+            💬 Support
+          </button>
+        </nav>
 
         <div className={styles.rightSection}>
           <button 
@@ -78,75 +88,43 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
           </button>
 
           {user ? (
-            <div className={styles.userProfile}>
-              <div className={styles.pointsBadge} title="Gamification Points">
-                ✨ {user.points !== undefined ? user.points : 0} pts
+            <>
+              <div className={styles.userProfile}>
+                <div className={styles.pointsBadge} title="Gamification Points">
+                  ✨ {user.points !== undefined ? user.points : 0} pts
+                </div>
+                <img 
+                  src={user.picture} 
+                  alt={user.name} 
+                  className={styles.avatar} 
+                  referrerPolicy="no-referrer"
+                  title={user.name}
+                />
+                <span className={styles.userName}>{user.name}</span>
               </div>
-              <img 
-                src={user.picture} 
-                alt={user.name} 
-                className={styles.avatar} 
-                referrerPolicy="no-referrer"
-              />
-              <span className={styles.userName}>{user.name}</span>
-              <button className={styles.logoutBtn} onClick={onLogout} title="Log Out">
-                Logout ➔
+              <button 
+                className={styles.logoutBtn} 
+                onClick={onLogout} 
+                title="Log Out"
+                aria-label="Log Out"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
               </button>
-            </div>
+            </>
           ) : (
-            <div className={styles.badges}>
-              <span className={styles.badge}>
-                <span className={styles.badgeDot} style={{background:'#00d4c8'}}/>
-                WHO GHO
-              </span>
-              <span className={styles.badge}>
-                <span className={styles.badgeDot} style={{background:'#4fa3ff'}}/>
-                MyHealthfinder
-              </span>
-              <span className={styles.badge}>
-                <span className={styles.badgeDot} style={{background:'#9b7ef8'}}/>
-                Gemini AI
-              </span>
-              <span className={styles.badge}>
-                <span className={styles.badgeDot} style={{background:'#ffba3b'}}/>
-                Mistral OCR
-              </span>
+            <div className={styles.guestRightSection}>
+              <button className={styles.signInBtn} onClick={onSignInClick}>
+                ✨ Join Pro / Sign In
+              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Hero section */}
-      {showHero && (
-        <div className={styles.hero}>
-          <div className={styles.heroTag}>🔬 AI-Powered Medical Verification</div>
-          <h1 className={styles.heroTitle}>
-            Fight Medical<br/>
-            <span className={styles.heroGradient}>Misinformation</span>
-          </h1>
-          <p className={styles.heroDesc}>
-            Verify health claims from social media against authoritative WHO data, 
-            evidence-based guidelines from the US Department of Health, and 
-            cutting-edge AI reasoning — in seconds.
-          </p>
-          <div className={styles.heroStats}>
-            <div className={styles.stat}>
-              <span className={styles.statNum}>WHO</span>
-              <span className={styles.statLabel}>Global Health Data</span>
-            </div>
-            <div className={styles.statDivider}/>
-            <div className={styles.stat}>
-              <span className={styles.statNum}>ODPHP</span>
-              <span className={styles.statLabel}>Evidence-Based Guidelines</span>
-            </div>
-            <div className={styles.statDivider}/>
-            <div className={styles.stat}>
-              <span className={styles.statNum}>Gemini</span>
-              <span className={styles.statLabel}>AI Reasoning</span>
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   );
 }

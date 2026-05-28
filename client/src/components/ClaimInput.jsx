@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import styles from './ClaimInput.module.css';
 
-const EXAMPLE_CLAIMS = [
-  "Sugar directly causes diabetes in healthy people",
-  "Vaccines cause autism in children",
-  "Coffee prevents Alzheimer's disease",
-  "Exercising for 30 minutes a day prevents heart disease",
-  "Vitamin C cures the common cold"
-];
-
 export default function ClaimInput({ onVerify, isLoading }) {
   const [claim, setClaim] = useState('');
   const [charCount, setCharCount] = useState(0);
@@ -20,11 +12,6 @@ export default function ClaimInput({ onVerify, isLoading }) {
 
   const handleSubmit = () => {
     if (claim.trim().length >= 10 && !isLoading) onVerify({ claim: claim.trim() });
-  };
-
-  const handleExample = (example) => {
-    setClaim(example);
-    setCharCount(example.length);
   };
 
   const handleKeyDown = (e) => {
@@ -81,23 +68,6 @@ export default function ClaimInput({ onVerify, isLoading }) {
         </div>
       </div>
 
-      {/* Example pills */}
-      <div className={styles.examples}>
-        <span className={styles.examplesLabel}>Try an example:</span>
-        <div className={styles.examplePills}>
-          {EXAMPLE_CLAIMS.map((ex, i) => (
-            <button
-              key={i}
-              className={styles.pill}
-              onClick={() => handleExample(ex)}
-              disabled={isLoading}
-              title={ex}
-            >
-              {ex.length > 42 ? ex.slice(0, 42) + '…' : ex}
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

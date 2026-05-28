@@ -1,0 +1,311 @@
+.contactContainer {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--shape-xl);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  padding: 32px 36px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.refractionEdge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.18) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.18) 70%, transparent 95%);
+  z-index: 10;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 36px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* ── Info Column ── */
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metaBadge {
+  display: inline-block;
+  padding: 8px 18px;
+  background: var(--md-primary-container);
+  border: 1px solid rgba(0, 229, 204, 0.18);
+  border-radius: var(--shape-full);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--md-primary);
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+  width: fit-content;
+}
+
+.title {
+  font-size: clamp(2rem, 6vw, 2.8rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--text-high);
+}
+
+.gradientText {
+  background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.desc {
+  font-size: 0.92rem;
+  color: var(--text-medium);
+  line-height: 1.75;
+}
+
+.contactDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.detailCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: var(--shape-md);
+  padding: 12px 16px;
+  overflow: hidden;
+  transition: all var(--duration-medium) var(--ease-expressive);
+}
+
+.detailCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+
+.detailCard:hover {
+  border-color: rgba(0, 229, 204, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 229, 204, 0.08);
+}
+
+.cardIcon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 229, 204, 0.2));
+}
+
+.cardTitle {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-low);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1px;
+}
+
+.cardLink {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-high);
+  text-decoration: none;
+  transition: color var(--duration-short);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.cardLink[href]:hover {
+  color: var(--md-primary);
+  text-shadow: 0 0 8px rgba(0, 229, 204, 0.25);
+}
+
+/* ── Form Card ── */
+.formCard {
+  position: relative;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: var(--shape-xl);
+  padding: 24px 28px;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.formEdge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.12) 30%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.12) 70%, transparent 95%);
+}
+
+.formHeader {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-high);
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 500px) {
+  .inputRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--shape-full);
+  color: var(--text-high);
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 12px 18px;
+  outline: none;
+  transition: all var(--duration-short) ease;
+}
+
+.input:focus {
+  border-color: var(--md-primary);
+  box-shadow: 0 0 0 3px rgba(0, 229, 204, 0.1);
+}
+
+.textarea {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--shape-md);
+  color: var(--text-high);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 12px 14px;
+  min-height: 90px;
+  max-height: 110px;
+  resize: none;
+  outline: none;
+  transition: all var(--duration-short) ease;
+}
+
+.textarea:focus {
+  border-color: var(--md-primary);
+  box-shadow: 0 0 0 3px rgba(0, 229, 204, 0.1);
+}
+
+.alertSuccess {
+  padding: 12px 16px;
+  background: var(--verdict-true-bg);
+  border: 1px solid rgba(93, 245, 192, 0.2);
+  border-radius: var(--shape-sm);
+  color: var(--verdict-true);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.alertError {
+  padding: 12px 16px;
+  background: var(--md-error-container);
+  border: 1px solid rgba(255, 107, 138, 0.2);
+  border-radius: var(--shape-sm);
+  color: var(--md-error);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.loadingRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(0, 55, 49, 0.3);
+  border-top-color: var(--md-on-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Mobile Padding ── */
+@media (max-width: 600px) {
+  .contactContainer {
+    padding: 24px 16px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .contactDetails {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .formCard {
+    padding: 20px 14px;
+  }
+}
+
+/* Custom overrides for the parent page main container standalone */
+:global(.contact-main-override) {
+  max-width: 1040px !important;
+  padding: 0 24px 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}

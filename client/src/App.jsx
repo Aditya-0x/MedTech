@@ -4,7 +4,7 @@ import ClaimInput from './components/ClaimInput';
 import ImageUpload from './components/ImageUpload';
 import ResultCard from './components/ResultCard';
 import LoadingSpinner from './components/LoadingSpinner';
-import Login from './components/Login';
+import LoginModal from './components/LoginModal';
 import Dashboard from './components/Dashboard';
 import styles from './App.module.css';
 
@@ -30,22 +30,46 @@ export default function App() {
   const [error, setError] = useState(null);
   const [hasImage, setHasImage] = useState(false);
 
+  const [showPreloader, setShowPreloader] = useState(true);
+
+  // Welcome Preloader screen timeout
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPreloader(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Authentication and view states
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [currentView, setCurrentView] = useState('login'); // 'login' | 'verify' | 'history'
+  const [currentView, setCurrentView] = useState('verify'); // 'verify' | 'history'
   const [isSaved, setIsSaved] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Load session from localStorage on mount
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    const promptLogin = params.get('promptLogin');
+
     const savedUser = localStorage.getItem('medverify_user');
     const savedToken = localStorage.getItem('medverify_token');
+    
+    let isUserLoggedIn = false;
+
     if (savedUser && savedToken) {
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
         setToken(savedToken);
-        setCurrentView('verify');
+        isUserLoggedIn = true;
+        
+        if (viewParam === 'history') {
+          setCurrentView('history');
+        } else {
+          setCurrentView('verify');
+        }
         
         // Fetch latest profile & points
         fetch(`${API_BASE}/auth/me`, {
@@ -64,19 +88,35 @@ export default function App() {
         console.error('Failed to parse saved user:', e);
         localStorage.removeItem('medverify_user');
         localStorage.removeItem('medverify_token');
-        setCurrentView('login');
+        setCurrentView('verify');
       }
     } else {
-      setCurrentView('login');
+      setCurrentView('verify');
+    }
+
+    if (promptLogin === 'true' || (viewParam === 'history' && !isUserLoggedIn)) {
+      setIsLoginModalOpen(true);
+      // Clean up URL parameters to keep it clean
+      const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+      window.history.replaceState({ path: newUrl }, '', newUrl);
+    } else if (viewParam) {
+      // Clean up URL parameters after loading the view
+      const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+      window.history.replaceState({ path: newUrl }, '', newUrl);
     }
   }, []);
 
-  const handleLoginSuccess = (userData, sessionToken) => {
+  const handleLoginSuccess = async (userData, sessionToken) => {
     setUser(userData);
     setToken(sessionToken);
     localStorage.setItem('medverify_user', JSON.stringify(userData));
     localStorage.setItem('medverify_token', sessionToken);
-    setCurrentView('verify');
+    setIsLoginModalOpen(false);
+    
+    // Auto-save guest research after successful login
+    if (result && !isSaved) {
+      await autoSaveReport(result, sessionToken);
+    }
   };
 
   const handleLogout = () => {
@@ -86,7 +126,7 @@ export default function App() {
     setIsSaved(false);
     localStorage.removeItem('medverify_user');
     localStorage.removeItem('medverify_token');
-    setCurrentView('login');
+    setCurrentView('verify');
   };
 
   const autoSaveReport = async (reportData, sessionToken) => {
@@ -194,23 +234,63 @@ export default function App() {
     setCurrentView('verify');
   };
 
-  if (currentView === 'login') {
-    return <Login onLoginSuccess={handleLoginSuccess} theme={theme} onToggleTheme={toggleTheme} />;
-  }
+  const handleViewChange = (view) => {
+    if (view === 'about') {
+      window.location.href = '/about.html';
+    } else if (view === 'contact') {
+      window.location.href = '/contact.html';
+    } else {
+      setCurrentView(view);
+    }
+  };
+
+
 
   return (
     <div className={styles.app}>
+      {showPreloader && (
+        <div className={styles.preloader} aria-hidden="true">
+          <div className={styles.preloaderLogo}>
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#preloadGrad)"/>
+              <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#preloadGrad)"/>
+              <circle cx="28" cy="28" r="10" fill="#07060f"/>
+              <circle cx="28" cy="28" r="9" fill="url(#preloadGrad2)"/>
+              <path d="M24 28.5l2.5 2.5 5-5" stroke="#07060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <defs>
+                <linearGradient id="preloadGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#00e5cc"/>
+                  <stop offset="1" stopColor="#b388ff"/>
+                </linearGradient>
+                <linearGradient id="preloadGrad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop stopColor="#00e5cc"/>
+                  <stop offset="1" stopColor="#5df5c0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h1 className={styles.preloaderTitle}>Med-Verify <span className={styles.proBadge}>PRO</span></h1>
+          <p className={styles.preloaderText}>Securing Clinical Synthesis Tunnel...</p>
+        </div>
+      )}
       <Header 
         user={user}
         activeView={currentView}
-        onViewChange={setCurrentView}
+        onViewChange={handleViewChange}
         onLogout={handleLogout}
         showHero={currentView === 'verify' && !result && !isLoading}
         theme={theme}
         onToggleTheme={toggleTheme}
+        onSignInClick={() => setIsLoginModalOpen(true)}
       />
 
-      <main className={currentView === 'verify' && isLoading ? styles.mainLoading : styles.main}>
+      <main className={
+        currentView === 'verify' && isLoading 
+          ? styles.mainLoading 
+          : currentView === 'verify' && !result 
+            ? `${styles.main} ${styles.mainLanding}` 
+            : styles.main
+      }>
         {currentView === 'history' && token && (
           <Dashboard 
             userToken={token}
@@ -221,55 +301,90 @@ export default function App() {
 
         {currentView === 'verify' && (
           <>
-            {/* Input section — hidden while showing results */}
+            {/* Input & Hero split grid section — hidden while showing results */}
             {!result && !isLoading && (
-              <section className={`${styles.inputSection} animate-fade-up`} aria-label="Claim verification input">
-                <div className={styles.tabGroup}>
-                  <button
-                    id="tab-text"
-                    className={`tab-btn ${activeTab === 'text' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('text')}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-                    </svg>
-                    Type a Claim
-                  </button>
-                  <button
-                    id="tab-image"
-                    className={`tab-btn ${activeTab === 'image' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('image')}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                      <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                    </svg>
-                    Upload Screenshot
-                  </button>
-                </div>
-
-                <div className={styles.inputPanel}>
-                  {activeTab === 'text' ? (
-                    <ClaimInput onVerify={handleVerify} isLoading={isLoading} />
-                  ) : (
-                    <ImageUpload onVerify={handleVerify} isLoading={isLoading} />
-                  )}
-                </div>
-
-                {error && (
-                  <div className={styles.errorBox} role="alert">
-                    <div className={styles.errorTitle}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff5e7d" strokeWidth="2" strokeLinecap="round">
-                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                      </svg>
-                      Error
+              <div className={`${styles.landingGrid} animate-fade-up`}>
+                {/* Left Column: Hero Content */}
+                <div className={styles.heroColumn}>
+                  <div className={styles.heroTag}>🔬 AI-Powered Medical Verification</div>
+                  <h1 className={styles.heroTitle}>
+                    Fight Medical<br/>
+                    <span className={styles.heroGradient}>Misinformation</span>
+                  </h1>
+                  <p className={styles.heroDesc}>
+                    Verify health claims from social media against authoritative WHO data, 
+                    evidence-based guidelines from the US Department of Health, and 
+                    cutting-edge AI reasoning — in seconds.
+                  </p>
+                  <div className={styles.heroStats}>
+                    <div className={styles.stat}>
+                      <span className={styles.statNum}>WHO</span>
+                      <span className={styles.statLabel}>Global Health Data</span>
                     </div>
-                    <p className={styles.errorText}>{error}</p>
-                    <div className={styles.errorHint}>
-                      💡 Make sure the backend server is running: <code>node server/index.js</code>
+                    <div className={styles.statDivider}/>
+                    <div className={styles.stat}>
+                      <span className={styles.statNum}>ODPHP</span>
+                      <span className={styles.statLabel}>Evidence-Based Guidelines</span>
+                    </div>
+                    <div className={styles.statDivider}/>
+                    <div className={styles.stat}>
+                      <span className={styles.statNum}>Gemini</span>
+                      <span className={styles.statLabel}>AI Reasoning</span>
                     </div>
                   </div>
-                )}
-              </section>
+                </div>
+
+                {/* Right Column: Search Input Panel */}
+                <div className={styles.searchColumn}>
+                  <section className={styles.inputSection} aria-label="Claim verification input">
+                    <div className={styles.tabGroup}>
+                      <button
+                        id="tab-text"
+                        className={`tab-btn ${activeTab === 'text' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('text')}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        Type a Claim
+                      </button>
+                      <button
+                        id="tab-image"
+                        className={`tab-btn ${activeTab === 'image' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('image')}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        Upload Screenshot
+                      </button>
+                    </div>
+
+                    <div className={styles.inputPanel}>
+                      {activeTab === 'text' ? (
+                        <ClaimInput onVerify={handleVerify} isLoading={isLoading} />
+                      ) : (
+                        <ImageUpload onVerify={handleVerify} isLoading={isLoading} />
+                      )}
+                    </div>
+
+                    {error && (
+                      <div className={styles.errorBox} role="alert">
+                        <div className={styles.errorTitle}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff5e7d" strokeWidth="2" strokeLinecap="round">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                          </svg>
+                          Error
+                        </div>
+                        <p className={styles.errorText}>{error}</p>
+                        <div className={styles.errorHint}>
+                          💡 Make sure the backend server is running: <code>node server/index.js</code>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              </div>
             )}
 
             {/* Loading state */}
@@ -288,68 +403,49 @@ export default function App() {
                   isAuthenticated={!!user}
                   isSaved={isSaved}
                   onSave={handleSave}
+                  onSignInRequired={() => setIsLoginModalOpen(true)}
                 />
               </section>
             )}
 
-            {/* How it works — shown when no result */}
-            {!result && !isLoading && (
-              <section className={styles.howItWorks}>
-                <h2 className={styles.howTitle}>How Med-Verify Works</h2>
-                <div className={styles.howSteps}>
-                  {[
-                    {
-                      step: '01',
-                      icon: '📸',
-                      title: 'Input Your Claim',
-                      desc: 'Type a medical claim or upload a screenshot of a social media post with health advice.'
-                    },
-                    {
-                      step: '02',
-                      icon: '👁',
-                      title: 'OCR Extraction',
-                      desc: 'Mistral OCR reads and extracts all text from your image with high accuracy.'
-                    },
-                    {
-                      step: '03',
-                      icon: '📊',
-                      title: 'Cross-Reference',
-                      desc: 'The claim is matched against WHO Global Health Observatory data, ODPHP evidence-based guidelines, and peer-reviewed studies.'
-                    },
-                    {
-                      step: '04',
-                      icon: '🧠',
-                      title: 'AI Verdict',
-                      desc: 'Gemini Frontier Models synthesize all evidence to deliver a structured, sourced fact-check verdict.'
-                    }
-                  ].map((item, i) => (
-                    <div key={i} className={styles.howStep} style={{ animationDelay: `${i * 0.1}s` }}>
-                      <div className={styles.howStepNum}>{item.step}</div>
-                      <div className={styles.howStepIcon}>{item.icon}</div>
-                      <h3 className={styles.howStepTitle}>{item.title}</h3>
-                      <p className={styles.howStepDesc}>{item.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+
           </>
         )}
       </main>
 
       {!isLoading && (
-        <footer className={styles.footer}>
-          <p>
-            Med-Verify Pro is built for NBEC 2026. Data synthesized from{' '}
-            <a href="https://www.who.int/data/gho" target="_blank" rel="noopener noreferrer">WHO GHO</a>,{' '}
-            <a href="https://odphp.health.gov/myhealthfinder" target="_blank" rel="noopener noreferrer">MyHealthfinder</a>,{' '}
-            <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed</a>,{' '}
-            <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov</a>,{' '}
-            <a href="https://open.fda.gov/" target="_blank" rel="noopener noreferrer">OpenFDA</a>,{' '}
-            and <a href="https://deepmind.google/technologies/gemini/" target="_blank" rel="noopener noreferrer">Google Gemini</a>.
-          </p>
-        </footer>
+        <>
+          <footer className={styles.footer}>
+            <div className={styles.footerContainer}>
+              <p className={styles.footerText}>
+                © 2026 Med-Verify Systems, Inc. All rights reserved. 
+                Synthesizing secure, authoritative clinical data from{' '}
+                <a href="https://www.who.int/data/gho" target="_blank" rel="noopener noreferrer">WHO GHO</a>,{' '}
+                <a href="https://odphp.health.gov/myhealthfinder" target="_blank" rel="noopener noreferrer">MyHealthfinder</a>,{' '}
+                <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed</a>,{' '}
+                <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov</a>,{' '}
+                and <a href="https://open.fda.gov/" target="_blank" rel="noopener noreferrer">OpenFDA</a>. 
+                All clinical verification pipelines are compliant under Ayushman Bharat Digital Mission (ABDM) and HIPAA guidelines.
+              </p>
+              <div className={styles.footerSection}>
+                <strong>Platform</strong>
+                <a href="/" style={{ color: 'var(--md-primary)' }}>Verify Claim</a>
+                <span className={styles.footerDivider}>•</span>
+                <a href="/about.html">About Creator</a>
+                <span className={styles.footerDivider}>•</span>
+                <a href="/contact.html">Contact Support</a>
+              </div>
+            </div>
+          </footer>
+        </>
       )}
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+        onLoginSuccess={handleLoginSuccess}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
     </div>
   );
 }

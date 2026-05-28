@@ -44,22 +44,25 @@
   /* ── Liquid Glass Surface System ────────────── */
   --glass-bg: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0.07) 0%,
     rgba(255, 255, 255, 0.025) 50%,
-    rgba(255, 255, 255, 0.04) 100%
+    rgba(179, 136, 255, 0.03) 100%
   );
-  --glass-border: rgba(255, 255, 255, 0.10);
-  --glass-border-focus: rgba(0, 229, 204, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-focus: rgba(0, 229, 204, 0.45);
   --glass-highlight: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0) 60%
+    90deg,
+    transparent 5%,
+    rgba(255, 255, 255, 0.22) 30%,
+    rgba(255, 255, 255, 0.32) 50%,
+    rgba(255, 255, 255, 0.22) 70%,
+    transparent 95%
   );
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35),
-                  0 2px 8px rgba(0, 0, 0, 0.2);
-  --glass-shadow-lg: 0 16px 64px rgba(0, 0, 0, 0.45),
-                     0 4px 16px rgba(0, 0, 0, 0.25);
-  --glass-blur: blur(28px) saturate(180%);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.45),
+                  0 2px 10px rgba(0, 0, 0, 0.2);
+  --glass-shadow-lg: 0 20px 80px rgba(0, 0, 0, 0.55),
+                     0 4px 20px rgba(0, 0, 0, 0.3);
+  --glass-blur: blur(36px) saturate(210%);
 
   /* ── Background ─────────────────────────────── */
   --bg-deep: #07060f;
@@ -78,12 +81,12 @@
   --shape-xl: 32px;
   --shape-full: 9999px;
 
-  /* ── Motion ─────────────────────────────────── */
-  --ease-expressive: cubic-bezier(0.2, 0, 0, 1);
-  --ease-emphasized: cubic-bezier(0.4, 0, 0.2, 1);
-  --duration-short: 150ms;
-  --duration-medium: 300ms;
-  --duration-long: 500ms;
+  /* ── Motion (Premium Vercel + Apple Curves) ─── */
+  --ease-expressive: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-emphasized: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-short: 180ms;
+  --duration-medium: 350ms;
+  --duration-long: 550ms;
 }
 
 /* ── Light Mode Color Theme Overrides ─────────── */
@@ -344,7 +347,7 @@ body::after {
 }
 
 /* ── Liquid Glass Inputs ──────────────────────── */
-textarea, input[type="text"] {
+textarea, input[type="text"], input[type="email"], input[type="tel"], input[type="number"] {
   width: 100%;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -360,13 +363,13 @@ textarea, input[type="text"] {
   transition: border-color var(--duration-short), box-shadow var(--duration-short);
 }
 
-textarea:focus, input[type="text"]:focus {
+textarea:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="number"]:focus {
   border-color: var(--md-primary);
   box-shadow: 0 0 0 3px rgba(0, 229, 204, 0.12),
               0 0 20px rgba(0, 229, 204, 0.06);
 }
 
-textarea::placeholder, input[type="text"]::placeholder {
+textarea::placeholder, input[type="text"]::placeholder, input[type="email"]::placeholder, input[type="tel"]::placeholder, input[type="number"]::placeholder {
   color: var(--text-low);
 }
 
@@ -380,7 +383,7 @@ textarea::placeholder, input[type="text"]::placeholder {
 
 /* ── Animations ───────────────────────────────── */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -390,7 +393,7 @@ textarea::placeholder, input[type="text"]::placeholder {
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.94); }
+  from { opacity: 0; transform: scale(0.97); }
   to   { opacity: 1; transform: scale(1); }
 }
 

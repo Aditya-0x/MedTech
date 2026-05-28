@@ -594,3 +594,98 @@
   animation: spin 0.8s linear infinite;
   margin-bottom: 16px;
 }
+
+/* ── Responsive Refinements ───────────────────── */
+@media (max-width: 900px) {
+  .pesticideLayout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .abdmWorkflowGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 24px 16px;
+  }
+  
+  .subTabHeader {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px;
+    gap: 8px;
+  }
+  
+  .subTabBtn, .activeSubTabBtn {
+    padding: 10px 16px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .refreshBtn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .title {
+    font-size: 22px;
+  }
+  
+  .subtitle {
+    font-size: 13px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .card {
+    padding: 18px;
+    border-radius: 16px;
+  }
+  
+  .abdmStepCard {
+    padding: 20px;
+    border-radius: 16px;
+  }
+  
+  .pesticideFormCard, .pesticideStatsCard {
+    padding: 20px;
+    border-radius: 16px;
+  }
+  
+  .exposureHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .exposureBadge {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .exposureCard {
+    padding: 16px;
+  }
+  
+  .exposureDetails {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .fhirConsole {
+    padding: 16px;
+    border-radius: 16px;
+  }
+}
