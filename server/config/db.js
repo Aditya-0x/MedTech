@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
+// Cache the connection promise to avoid redundant connection triggers in serverless cold starts
+let cachedConnectionPromise = null;
+
 const connectDB = async () => {
   try {
-    // We expect MONGO_URI to be provided via environment variables in Vercel
-    // For local fallback testing without a DB, we can just log a warning and return.
     const mongoUri = process.env.MONGO_URI;
     
     if (!mongoUri) {
@@ -11,16 +12,62 @@ const connectDB = async () => {
       return false;
     }
 
-    const conn = await mongoose.connect(mongoUri);
+    if (mongoose.connection.readyState === 1) {
+      return true;
+    }
 
-    console.log(`🚀 MongoDB Connected: ${conn.connection.host}`);
+    if (!cachedConnectionPromise) {
+      console.log('🔌 Connecting to MongoDB...');
+      cachedConnectionPromise = mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 5000 // 5 seconds timeout
+      });
+    }
+
+    await cachedConnectionPromise;
+    console.log(`🚀 MongoDB Connected: ${mongoose.connection.host}`);
     return true;
   } catch (error) {
     console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    // In production, we don't strictly crash the app if DB fails, 
-    // we handle it gracefully, but usually you'd process.exit(1).
+    cachedConnectionPromise = null; // Reset cache on failure
     return false;
   }
 };
 
-module.exports = connectDB;
+const ensureDbConnected = async () => {
+  if (!process.env.MONGO_URI) {
+    return false;
+  }
+  
+  if (mongoose.connection.readyState === 1) {
+    return true;
+  }
+  
+  if (mongoose.connection.readyState === 2) {
+    // Wait for active connecting state to resolve
+    await new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (mongoose.connection.readyState === 1) {
+          clearInterval(checkInterval);
+          resolve(true);
+        } else if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+          clearInterval(checkInterval);
+          resolve(false);
+        }
+      }, 50);
+      
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        resolve(false);
+      }, 6000); // 6 seconds timeout max
+    });
+    return mongoose.connection.readyState === 1;
+  }
+
+  // ReadyState is 0 (disconnected) or 3 (disconnecting), try connecting again
+  return await connectDB();
+};
+
+module.exports = {
+  connectDB,
+  ensureDbConnected
+};

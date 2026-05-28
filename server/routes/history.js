@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const { ensureDbConnected } = require('../config/db');
 const { authenticateToken } = require('./auth');
 const History = require('../models/History');
 const User = require('../models/User');
@@ -16,10 +17,9 @@ router.get('/history', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Check if Mongo is connected. If not, fallback to in-memory store
-    const isMongoConnected = mongoose.connection.readyState === 1;
+    const dbOnline = await ensureDbConnected();
 
-    if (!process.env.MONGO_URI || !isMongoConnected) {
+    if (!dbOnline) {
       console.warn('⚠️ MongoDB not connected. Serving history from in-memory fallback store.');
       const history = userHistoryFallback.get(userId) || [];
       return res.json({ success: true, history });
@@ -55,9 +55,9 @@ router.post('/history', authenticateToken, async (req, res) => {
       savedAt: new Date().toISOString()
     };
 
-    const isMongoConnected = mongoose.connection.readyState === 1;
+    const dbOnline = await ensureDbConnected();
 
-    if (!process.env.MONGO_URI || !isMongoConnected) {
+    if (!dbOnline) {
       if (!userHistoryFallback.has(userId)) userHistoryFallback.set(userId, []);
       const history = userHistoryFallback.get(userId);
       history.unshift(enrichedReport);
@@ -132,9 +132,9 @@ router.delete('/history/:id', authenticateToken, async (req, res) => {
     const userId = req.user.id;
     const reportId = req.params.id;
 
-    const isMongoConnected = mongoose.connection.readyState === 1;
+    const dbOnline = await ensureDbConnected();
 
-    if (!process.env.MONGO_URI || !isMongoConnected) {
+    if (!dbOnline) {
       const history = userHistoryFallback.get(userId) || [];
       const updatedHistory = history.filter(r => r.id !== reportId);
       userHistoryFallback.set(userId, updatedHistory);

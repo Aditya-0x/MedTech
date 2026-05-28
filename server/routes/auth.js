@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { ensureDbConnected } = require('../config/db');
 const { sendWelcomeEmail, sendOtpEmail, sendContactEmail } = require('../services/emailService');
 const mongoose = require('mongoose');
 
@@ -47,7 +48,7 @@ router.post('/auth/send-otp', async (req, res) => {
     }
 
     // Check if user is offline or online
-    const dbOnline = process.env.MONGO_URI && mongoose.connection.readyState === 1;
+    const dbOnline = await ensureDbConnected();
     let existingUser = false;
     if (dbOnline) {
       const user = await User.findOne({ email: email.toLowerCase() });
@@ -107,7 +108,7 @@ router.post('/auth/verify-otp', async (req, res) => {
     // Correct OTP verified! Remove it.
     otps.delete(emailKey);
 
-    const dbOnline = process.env.MONGO_URI && mongoose.connection.readyState === 1;
+    const dbOnline = await ensureDbConnected();
 
     if (!dbOnline) {
       console.warn('⚠️ MongoDB is offline. Generating mock user session for testing.');
@@ -187,7 +188,8 @@ router.post('/auth/google', async (req, res) => {
       return res.status(400).json({ error: 'Missing credential token' });
     }
 
-    if (!process.env.MONGO_URI || mongoose.connection.readyState !== 1) {
+    const dbOnline = await ensureDbConnected();
+    if (!dbOnline) {
       console.warn('⚠️ MongoDB is offline. Serving mock Google OAuth sandbox session.');
       const mockUser = { _id: payloadData.sub, name: payloadData.name, email: payloadData.email, points: 0, picture: payloadData.picture };
       return res.json({ success: true, token: generateToken(mockUser), user: mockUser });
@@ -236,7 +238,8 @@ const authenticateToken = (req, res, next) => {
 };
 
 router.get('/auth/me', authenticateToken, async (req, res) => {
-  if (!process.env.MONGO_URI || mongoose.connection.readyState !== 1) {
+  const dbOnline = await ensureDbConnected();
+  if (!dbOnline) {
     return res.json({ success: true, user: req.user });
   }
   const user = await User.findById(req.user.id);
