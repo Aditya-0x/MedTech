@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './Header.module.css';
 
 export default function Header({ user, activeView, onViewChange, onLogout, showHero, theme, onToggleTheme, onSignInClick }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleNavClick = (view) => {
+    onViewChange(view);
+    setIsMenuOpen(false);
+  };
+
+  const handleSignIn = () => {
+    onSignInClick();
+    setIsMenuOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    onLogout();
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className={styles.header}>
       {/* Top bar */}
       <div className={styles.topBar}>
         <div 
           className={styles.logo} 
-          onClick={() => onViewChange('verify')} 
+          onClick={() => handleNavClick('verify')} 
           style={{ cursor: 'pointer' }}
         >
           <div className={styles.logoIcon}>
@@ -38,33 +55,35 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
           </div>
         </div>
 
+        {/* Desktop Navigation (hidden on mobile) */}
         <nav className={styles.navigation}>
           <button
             className={`${styles.navTab} ${activeView === 'verify' ? styles.activeTab : ''}`}
-            onClick={() => onViewChange('verify')}
+            onClick={() => handleNavClick('verify')}
           >
             🔬 Verify
           </button>
           <button
             className={`${styles.navTab} ${activeView === 'history' ? styles.activeTab : ''}`}
-            onClick={() => user ? onViewChange('history') : onSignInClick()}
+            onClick={() => user ? handleNavClick('history') : onSignInClick()}
           >
             📊 History {!user && '🔒'}
           </button>
           <button
             className={`${styles.navTab} ${activeView === 'about' ? styles.activeTab : ''}`}
-            onClick={() => onViewChange('about')}
+            onClick={() => handleNavClick('about')}
           >
             👨‍⚕️ About
           </button>
           <button
             className={`${styles.navTab} ${activeView === 'contact' ? styles.activeTab : ''}`}
-            onClick={() => onViewChange('contact')}
+            onClick={() => handleNavClick('contact')}
           >
             💬 Support
           </button>
         </nav>
 
+        {/* Desktop Controls (hidden on mobile) */}
         <div className={styles.rightSection}>
           <button 
             className={styles.themeToggle} 
@@ -104,7 +123,7 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
               </div>
               <button 
                 className={styles.logoutBtn} 
-                onClick={onLogout} 
+                onClick={handleLogoutClick} 
                 title="Log Out"
                 aria-label="Log Out"
               >
@@ -117,14 +136,117 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
             </>
           ) : (
             <div className={styles.guestRightSection}>
-              <button className={styles.signInBtn} onClick={onSignInClick}>
+              <button className={styles.signInBtn} onClick={handleSignIn}>
                 ✨ Join Pro / Sign In
               </button>
             </div>
           )}
         </div>
+
+        {/* Mobile controls (visible only on mobile) */}
+        <div className={styles.mobileControls}>
+          <button 
+            className={`${styles.themeToggle} ${styles.mobileThemeToggle}`} 
+            onClick={onToggleTheme} 
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle Light/Dark Theme"
+          >
+            {theme === 'dark' ? (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="5" />
+                <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+              </svg>
+            )}
+          </button>
+
+          <button
+            className={`${styles.hamburger} ${isMenuOpen ? styles.hamburgerActive : ''}`}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle Menu"
+            aria-expanded={isMenuOpen}
+          >
+            <span className={styles.hamburgerLine}></span>
+            <span className={styles.hamburgerLine}></span>
+            <span className={styles.hamburgerLine}></span>
+          </button>
+        </div>
       </div>
 
+      {/* Mobile Glassmorphic Dropdown Panel */}
+      <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ''}`}>
+        <nav className={styles.mobileNavigation}>
+          <button
+            className={`${styles.mobileNavTab} ${activeView === 'verify' ? styles.mobileActiveTab : ''}`}
+            onClick={() => handleNavClick('verify')}
+          >
+            🔬 Verify Claim
+          </button>
+          <button
+            className={`${styles.mobileNavTab} ${activeView === 'history' ? styles.mobileActiveTab : ''}`}
+            onClick={() => user ? handleNavClick('history') : handleSignIn()}
+          >
+            📊 Search History {!user && '🔒'}
+          </button>
+          <button
+            className={`${styles.mobileNavTab} ${activeView === 'about' ? styles.mobileActiveTab : ''}`}
+            onClick={() => handleNavClick('about')}
+          >
+            👨‍⚕️ About Creator
+          </button>
+          <button
+            className={`${styles.mobileNavTab} ${activeView === 'contact' ? styles.mobileActiveTab : ''}`}
+            onClick={() => handleNavClick('contact')}
+          >
+            💬 Contact Support
+          </button>
+        </nav>
+
+        <div className={styles.mobileMenuDivider} />
+
+        <div className={styles.mobileProfileSection}>
+          {user ? (
+            <div className={styles.mobileUserContainer}>
+              <div className={styles.mobileUserInfo}>
+                <img 
+                  src={user.picture} 
+                  alt={user.name} 
+                  className={styles.mobileAvatar} 
+                  referrerPolicy="no-referrer"
+                />
+                <div className={styles.mobileUserDetails}>
+                  <span className={styles.mobileUserName}>{user.name}</span>
+                  <div className={styles.mobilePointsBadge} title="Gamification Points">
+                    ✨ {user.points !== undefined ? user.points : 0} pts
+                  </div>
+                </div>
+              </div>
+              <button 
+                className={styles.mobileLogoutBtn} 
+                onClick={handleLogoutClick}
+                aria-label="Log Out"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                <span>Log Out</span>
+              </button>
+            </div>
+          ) : (
+            <button className={styles.mobileSignInBtn} onClick={handleSignIn}>
+              ✨ Join Pro / Sign In
+            </button>
+          )}
+        </div>
+      </div>
     </header>
   );
 }
