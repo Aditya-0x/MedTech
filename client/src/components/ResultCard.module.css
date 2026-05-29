@@ -952,3 +952,13 @@
   background: rgba(93, 245, 192, 0.12);
   border-color: rgba(93, 245, 192, 0.4);
 }
+
+/* ── Light Mode Contrast Overrides ── */
+[data-theme="light"] .factItem,
+[data-theme="light"] .claimBox,
+[data-theme="light"] .noSources,
+[data-theme="light"] .disclaimer {
+  background: rgba(15, 12, 30, 0.025) !important;
+  border-color: rgba(15, 12, 30, 0.06) !important;
+}
+

@@ -309,3 +309,23 @@
   flex-direction: column !important;
   justify-content: center !important;
 }
+
+/* ── Light Mode Contrast Overrides ── */
+[data-theme="light"] .detailCard,
+[data-theme="light"] .formCard {
+  background: rgba(15, 12, 30, 0.025) !important;
+  border-color: rgba(15, 12, 30, 0.06) !important;
+}
+
+[data-theme="light"] .input,
+[data-theme="light"] .textarea {
+  background: rgba(15, 12, 30, 0.02) !important;
+  border-color: rgba(15, 12, 30, 0.08) !important;
+}
+
+[data-theme="light"] .input:focus,
+[data-theme="light"] .textarea:focus {
+  border-color: var(--md-primary) !important;
+  box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.12) !important;
+}
+

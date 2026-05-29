@@ -322,3 +322,17 @@
     margin-bottom: 20px;
   }
 }
+
+/* ── Light Mode Contrast Overrides ── */
+[data-theme="light"] .statCard,
+[data-theme="light"] .infraCard,
+[data-theme="light"] .profileCard {
+  background: rgba(15, 12, 30, 0.035) !important;
+  border-color: rgba(15, 12, 30, 0.08) !important;
+}
+
+[data-theme="light"] .profileBadge {
+  background: rgba(15, 12, 30, 0.02) !important;
+  border-color: rgba(15, 12, 30, 0.05) !important;
+}
+

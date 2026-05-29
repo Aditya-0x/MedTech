@@ -125,18 +125,18 @@
   --bg-surface: #ffffff;
 
   /* Typography */
-  --text-high: rgba(15, 12, 30, 0.94);
-  --text-medium: rgba(15, 12, 30, 0.65);
-  --text-low: rgba(15, 12, 30, 0.38);
+  --text-high: rgba(15, 12, 30, 0.98);
+  --text-medium: rgba(15, 12, 30, 0.85);
+  --text-low: rgba(15, 12, 30, 0.62);
 
   /* Liquid Glass Light Mode */
   --glass-bg: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.82) 0%,
-    rgba(255, 255, 255, 0.68) 50%,
-    rgba(255, 255, 255, 0.74) 100%
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.92) 50%,
+    rgba(255, 255, 255, 0.94) 100%
   );
-  --glass-border: rgba(15, 12, 30, 0.08);
+  --glass-border: rgba(15, 12, 30, 0.12);
   --glass-border-focus: rgba(0, 121, 107, 0.3);
   --glass-shadow: 0 8px 32px rgba(15, 12, 30, 0.06),
                   0 2px 8px rgba(15, 12, 30, 0.03);

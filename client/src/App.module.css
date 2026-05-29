@@ -677,3 +677,14 @@
   color: var(--md-primary);
   transform: translateY(-1px);
 }
+
+/* ── Light Mode Contrast Overrides ── */
+[data-theme="light"] .howStep {
+  background: rgba(15, 12, 30, 0.025) !important;
+  border-color: rgba(15, 12, 30, 0.06) !important;
+}
+
+[data-theme="light"] .statDivider {
+  background: rgba(15, 12, 30, 0.08) !important;
+}
+
