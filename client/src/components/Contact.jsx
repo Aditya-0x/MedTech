@@ -54,7 +54,7 @@ export default function Contact() {
               <div className={styles.cardIcon}>📬</div>
               <div>
                 <h3 className={styles.cardTitle}>Email Address</h3>
-                <a href="mailto:aditya@medverify.pro" className={styles.cardLink}>aditya@medverify.pro</a>
+                <a href="mailto:adive00001@gmail.com" className={styles.cardLink}>adive00001@gmail.com</a>
               </div>
             </div>
 
