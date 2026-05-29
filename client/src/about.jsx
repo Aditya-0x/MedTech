@@ -68,14 +68,6 @@ function AboutPage() {
             Synthesizing secure, authoritative clinical data from WHO, PubMed, and FDA. 
             All clinical verification pipelines are compliant under HIPAA guidelines.
           </p>
-          <div className={styles.footerSection}>
-            <strong>Platform</strong>
-            <a href="/">Verify Claim</a>
-            <span className={styles.footerDivider}>•</span>
-            <a href="/about.html" style={{ color: 'var(--md-primary)' }}>About Creator</a>
-            <span className={styles.footerDivider}>•</span>
-            <a href="/contact.html">Contact Support</a>
-          </div>
         </div>
       </footer>
     </div>

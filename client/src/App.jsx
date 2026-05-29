@@ -427,14 +427,6 @@ export default function App() {
                 and <a href="https://open.fda.gov/" target="_blank" rel="noopener noreferrer">OpenFDA</a>. 
                 All clinical verification pipelines are compliant under HIPAA guidelines.
               </p>
-              <div className={styles.footerSection}>
-                <strong>Platform</strong>
-                <a href="/" style={{ color: 'var(--md-primary)' }}>Verify Claim</a>
-                <span className={styles.footerDivider}>•</span>
-                <a href="/about.html">About Creator</a>
-                <span className={styles.footerDivider}>•</span>
-                <a href="/contact.html">Contact Support</a>
-              </div>
             </div>
           </footer>
         </>
