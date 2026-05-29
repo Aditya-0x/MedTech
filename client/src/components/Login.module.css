@@ -94,7 +94,7 @@
 .cyanCircle {
   width: 500px;
   height: 500px;
-  background: #00e5cc;
+  background: #006466;
   top: -100px;
   right: -50px;
   animation-duration: 22s;
@@ -103,7 +103,7 @@
 .purpleCircle {
   width: 550px;
   height: 550px;
-  background: #b388ff;
+  background: #4D194D;
   bottom: -150px;
   left: -50px;
   animation-duration: 18s;
@@ -376,22 +376,22 @@
 
 .submitAuthBtn {
   width: 100%;
-  background: linear-gradient(135deg, #00e5cc, #b388ff);
+  background: linear-gradient(135deg, var(--md-primary) 0%, var(--md-primary-dim) 100%);
   border: none;
   padding: 14px 20px;
   border-radius: 14px;
-  color: #07060f;
+  color: var(--md-on-primary);
   font-weight: 800;
   font-size: 14px;
   cursor: pointer;
   margin-top: 4px;
   transition: all 0.25s ease;
-  box-shadow: 0 4px 14px rgba(0, 229, 204, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 100, 102, 0.25);
 }
 
 .submitAuthBtn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 229, 204, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 100, 102, 0.4);
 }
 
 .googleContainer {
@@ -445,7 +445,7 @@
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top-color: #00e5cc;
+  border-top-color: var(--md-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

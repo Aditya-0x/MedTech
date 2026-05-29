@@ -19,8 +19,8 @@ export default function LoadingSpinner({ hasImage = false }) {
               <path d="M8 12h8M12 8v8" stroke="url(#orbGrad)" strokeWidth="2" strokeLinecap="round"/>
               <defs>
                 <linearGradient id="orbGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#00d4c8"/>
-                  <stop offset="1" stopColor="#4fa3ff"/>
+                  <stop stopColor="var(--md-primary)"/>
+                  <stop offset="1" stopColor="var(--md-secondary)"/>
                 </linearGradient>
               </defs>
             </svg>

@@ -34,17 +34,17 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
               <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#grad1)"/>
               <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#grad1)"/>
               {/* Checkmark overlay */}
-              <circle cx="28" cy="28" r="10" fill="#050b1f"/>
+              <circle cx="28" cy="28" r="10" fill="var(--bg-deep)"/>
               <circle cx="28" cy="28" r="9" fill="url(#grad2)"/>
-              <path d="M24 28.5l2.5 2.5 5-5" stroke="#050b1f" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M24 28.5l2.5 2.5 5-5" stroke="var(--bg-deep)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <defs>
                 <linearGradient id="grad1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#00d4c8"/>
-                  <stop offset="1" stopColor="#4fa3ff"/>
+                  <stop stopColor="var(--md-primary)"/>
+                  <stop offset="1" stopColor="var(--md-secondary)"/>
                 </linearGradient>
                 <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#00d4c8"/>
-                  <stop offset="1" stopColor="#22d3a0"/>
+                  <stop stopColor="var(--md-primary)"/>
+                  <stop offset="1" stopColor="var(--md-primary-dim)"/>
                 </linearGradient>
               </defs>
             </svg>

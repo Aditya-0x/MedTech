@@ -12,17 +12,17 @@
 }
 
 :root {
-  /* ── Material You Tonal Palette ─────────────── */
-  --md-primary: #00e5cc;
-  --md-primary-dim: #00bfa6;
-  --md-primary-container: rgba(0, 229, 204, 0.08);
-  --md-on-primary: #003731;
+  /* ── Material You Tonal Palette (Teal & Plum Overhaul) ─── */
+  --md-primary: #00a896;
+  --md-primary-dim: #006466;
+  --md-primary-container: rgba(0, 100, 102, 0.12);
+  --md-on-primary: #002224;
   --md-on-primary-container: #c8fff6;
 
-  --md-secondary: #b388ff;
-  --md-secondary-dim: #7c4dff;
-  --md-secondary-container: rgba(124, 77, 255, 0.10);
-  --md-on-secondary-container: #ede7ff;
+  --md-secondary: #aa73aa;
+  --md-secondary-dim: #4D194D;
+  --md-secondary-container: rgba(77, 25, 77, 0.14);
+  --md-on-secondary-container: #ffe7ff;
 
   --md-tertiary: #ffab40;
   --md-tertiary-dim: #ff9100;
@@ -38,40 +38,40 @@
   --verdict-false-bg: rgba(255, 107, 138, 0.08);
   --verdict-misleading: #ffcc02;
   --verdict-misleading-bg: rgba(255, 204, 2, 0.08);
-  --verdict-unverified: #b388ff;
-  --verdict-unverified-bg: rgba(179, 136, 255, 0.08);
+  --verdict-unverified: #aa73aa;
+  --verdict-unverified-bg: rgba(170, 115, 170, 0.08);
 
   /* ── Liquid Glass Surface System ────────────── */
   --glass-bg: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0.025) 50%,
-    rgba(179, 136, 255, 0.03) 100%
+    rgba(33, 47, 69, 0.5) 0%,
+    rgba(27, 58, 75, 0.35) 50%,
+    rgba(77, 25, 77, 0.28) 100%
   );
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-focus: rgba(0, 229, 204, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.07);
+  --glass-border-focus: rgba(0, 168, 150, 0.45);
   --glass-highlight: linear-gradient(
     90deg,
     transparent 5%,
-    rgba(255, 255, 255, 0.22) 30%,
-    rgba(255, 255, 255, 0.32) 50%,
-    rgba(255, 255, 255, 0.22) 70%,
+    rgba(255, 255, 255, 0.18) 30%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.18) 70%,
     transparent 95%
   );
-  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.45),
-                  0 2px 10px rgba(0, 0, 0, 0.2);
-  --glass-shadow-lg: 0 20px 80px rgba(0, 0, 0, 0.55),
-                     0 4px 20px rgba(0, 0, 0, 0.3);
+  --glass-shadow: 0 10px 40px rgba(0, 0, 0, 0.5),
+                  0 2px 10px rgba(0, 0, 0, 0.25);
+  --glass-shadow-lg: 0 20px 80px rgba(0, 0, 0, 0.6),
+                     0 4px 20px rgba(0, 0, 0, 0.35);
   --glass-blur: blur(36px) saturate(210%);
 
   /* ── Background ─────────────────────────────── */
-  --bg-deep: #07060f;
-  --bg-surface: #0e0c1d;
+  --bg-deep: #0a0e13;
+  --bg-surface: #121921;
 
   /* ── Typography ─────────────────────────────── */
-  --text-high: rgba(255, 255, 255, 0.95);
-  --text-medium: rgba(255, 255, 255, 0.70);
-  --text-low: rgba(255, 255, 255, 0.38);
+  --text-high: rgba(255, 255, 255, 0.96);
+  --text-medium: rgba(255, 255, 255, 0.72);
+  --text-low: rgba(255, 255, 255, 0.4);
 
   /* ── Shape (Material You Expressive) ────────── */
   --shape-xs: 8px;
@@ -182,9 +182,9 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(0, 229, 204, 0.07) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 80% at 85% 75%, rgba(124, 77, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(255, 171, 64, 0.025) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 60% at 15% 20%, rgba(0, 100, 102, 0.16) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 85% 75%, rgba(77, 25, 77, 0.14) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(33, 47, 69, 0.08) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
 }

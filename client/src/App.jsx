@@ -254,17 +254,17 @@ export default function App() {
             <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#preloadGrad)"/>
               <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#preloadGrad)"/>
-              <circle cx="28" cy="28" r="10" fill="#07060f"/>
+              <circle cx="28" cy="28" r="10" fill="var(--bg-deep)"/>
               <circle cx="28" cy="28" r="9" fill="url(#preloadGrad2)"/>
-              <path d="M24 28.5l2.5 2.5 5-5" stroke="#07060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M24 28.5l2.5 2.5 5-5" stroke="var(--bg-deep)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               <defs>
                 <linearGradient id="preloadGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#00e5cc"/>
-                  <stop offset="1" stopColor="#b388ff"/>
+                  <stop stopColor="var(--md-primary)"/>
+                  <stop offset="1" stopColor="var(--md-secondary)"/>
                 </linearGradient>
                 <linearGradient id="preloadGrad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#00e5cc"/>
-                  <stop offset="1" stopColor="#5df5c0"/>
+                  <stop stopColor="var(--md-primary)"/>
+                  <stop offset="1" stopColor="var(--md-primary-dim)"/>
                 </linearGradient>
               </defs>
             </svg>
