@@ -1,5 +1,4 @@
 import React, { useState, useRef, useCallback } from 'react';
-import styles from './ImageUpload.module.css';
 
 export default function ImageUpload({ onVerify, isLoading }) {
   const [dragOver, setDragOver] = useState(false);
@@ -13,14 +12,12 @@ export default function ImageUpload({ onVerify, isLoading }) {
     if (!f) return;
     setError(null);
 
-    // Validate mime-type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(f.type)) {
       setError('Unsupported file format. Please upload a JPG, JPEG, PNG, WEBP, or GIF screenshot.');
       return;
     }
 
-    // Validate file size (10MB limit)
     const maxSize = 10 * 1024 * 1024;
     if (f.size > maxSize) {
       setError('Screenshot exceeds size limit. Please upload an image smaller than 10MB.');
@@ -32,7 +29,6 @@ export default function ImageUpload({ onVerify, isLoading }) {
     reader.onload = (e) => setPreview(e.target.result);
     reader.readAsDataURL(f);
   };
-
 
   const onDrop = useCallback((e) => {
     e.preventDefault();
@@ -71,11 +67,11 @@ export default function ImageUpload({ onVerify, isLoading }) {
   };
 
   return (
-    <div className={styles.container} onPaste={handlePaste}>
+    <div className="w-full h-full flex flex-col p-4" onPaste={handlePaste}>
       {!preview ? (
         <>
           <div
-            className={`${styles.dropZone} ${dragOver ? styles.dragOver : ''}`}
+            className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 transform group hover:scale-[1.01] hover:shadow-float ${dragOver ? 'border-primary bg-primary/10 animate-sexy-pulse' : 'border-outline-variant/60 hover:border-primary/80 bg-surface-container-low/50'}`}
             onDrop={onDrop}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
@@ -83,111 +79,78 @@ export default function ImageUpload({ onVerify, isLoading }) {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && inputRef.current?.click()}
-            id="image-upload-zone"
           >
             <input
               ref={inputRef}
               type="file"
               accept="image/*"
-              className={styles.fileInput}
+              className="hidden"
               onChange={(e) => handleFile(e.target.files[0])}
             />
-            <div className={styles.dropIcon}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="3"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <polyline points="21 15 16 10 5 21"/>
-              </svg>
+            <span className="material-symbols-outlined text-5xl text-primary mb-4 group-hover:animate-float-sexy group-hover:text-tertiary transition-colors">image</span>
+            <div className="font-headline text-3xl text-on-surface mb-2 group-hover:text-primary transition-colors">
+              {dragOver ? 'Drop it like it\'s hot' : 'Upload Social Media Screenshot'}
             </div>
-            <div className={styles.dropTitle}>
-              {dragOver ? 'Drop your screenshot here' : 'Upload Social Media Screenshot'}
+            <div className="font-body text-on-surface-variant text-sm mb-4">
+              Drag & drop, click to browse, or <span className="font-bold text-primary">Ctrl+V</span> to paste
             </div>
-            <div className={styles.dropDesc}>
-              Drag & drop, click to browse, or <span className={styles.highlight}>Ctrl+V</span> to paste
-            </div>
-            <div className={styles.dropFormats}>
+            <div className="font-body text-xs text-secondary bg-surface-variant/50 px-4 py-2 rounded-full shadow-sm group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
               Supports: PNG, JPG, WEBP, GIF · Max 10MB
-            </div>
-
-            <div className={styles.dropExamples}>
-              <span className={styles.examplesLabel}>Works great with:</span>
-              <div className={styles.examplesPills}>
-                <span className={styles.exPill}>Instagram posts</span>
-                <span className={styles.exPill}>Twitter/X threads</span>
-                <span className={styles.exPill}>Facebook screenshots</span>
-                <span className={styles.exPill}>TikTok captions</span>
-                <span className={styles.exPill}>WhatsApp forwards</span>
-              </div>
             </div>
           </div>
           {error && (
-            <div className={styles.errorBox} role="alert">
-              <div className={styles.errorTitle}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff5e7d" strokeWidth="2.5" strokeLinecap="round">
-                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
-                Upload Validation Error
-              </div>
-              <p className={styles.errorText}>{error}</p>
+            <div className="mt-4 p-4 bg-error-container text-on-error-container rounded-lg font-body text-sm flex gap-2 items-center">
+              <span className="material-symbols-outlined text-error">error</span>
+              {error}
             </div>
           )}
         </>
       ) : (
-        <div className={styles.previewArea}>
-          <div className={styles.previewHeader}>
-            <div className={styles.previewTitle}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00d4c8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              Screenshot loaded
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <div className="font-body text-primary font-medium flex gap-2 items-center">
+              <span className="material-symbols-outlined">check_circle</span> Screenshot loaded
             </div>
-            <button className={styles.clearBtn} onClick={clearFile} disabled={isLoading}>
+            <button className="text-error hover:underline text-sm font-body" onClick={clearFile} disabled={isLoading}>
               ✕ Remove
             </button>
           </div>
 
-          <div className={styles.imageWrapper}>
-            <img src={preview} alt="Uploaded screenshot for analysis" className={styles.previewImg}/>
-            <div className={styles.imageBadge}>
-              <span>🔍 OCR will extract text</span>
+          <div className="relative rounded-lg overflow-hidden border border-outline-variant max-h-48 flex justify-center bg-surface-container-lowest">
+            <img src={preview} alt="Uploaded screenshot" className="object-contain h-full"/>
+            <div className="absolute bottom-2 right-2 bg-background/90 backdrop-blur px-2 py-1 rounded text-xs font-body shadow-sm">
+              🔍 OCR will extract text
             </div>
           </div>
 
-          <div className={styles.extraClaimSection}>
-            <label className={styles.extraLabel} htmlFor="extra-context">
-              Additional context <span className={styles.optional}>(optional)</span>
-            </label>
-            <input
-              id="extra-context"
-              type="text"
-              className={styles.extraInput}
-              value={extraClaim}
-              onChange={(e) => setExtraClaim(e.target.value)}
-              placeholder="Add context or highlight a specific claim to verify..."
-              disabled={isLoading}
-            />
+          <div>
+             <input
+               type="text"
+               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 font-body text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+               value={extraClaim}
+               onChange={(e) => setExtraClaim(e.target.value)}
+               placeholder="Add context or highlight a specific claim... (optional)"
+               disabled={isLoading}
+             />
           </div>
 
-          <div className={styles.submitRow}>
-            <div className={styles.fileInfo}>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-2">
+            <div className="text-xs text-secondary font-body">
               📎 {file?.name} · {(file?.size / 1024).toFixed(0)} KB
             </div>
             <button
-              id="analyze-image-btn"
-              className="btn-primary"
+              className={`bg-gradient-to-r from-primary to-tertiary text-on-primary px-8 py-3 rounded-lg font-body font-medium hover:from-primary-container hover:to-tertiary-container hover:text-on-primary-container hover:scale-105 hover:shadow-float transition-all duration-300 shadow-soft flex items-center gap-2 group ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:animate-sexy-pulse'}`}
               onClick={handleSubmit}
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <span className={styles.spinnerSmall}/>
-                  Extracting & Analyzing...
+                  <span className="animate-spin material-symbols-outlined">progress_activity</span>
+                  Extracting...
                 </>
               ) : (
                 <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                  </svg>
+                  <span className="material-symbols-outlined group-hover:-translate-y-1 transition-transform">analytics</span>
                   Analyze Screenshot
                 </>
               )}

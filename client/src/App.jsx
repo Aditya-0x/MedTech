@@ -6,17 +6,22 @@ import ResultCard from './components/ResultCard';
 import LoadingSpinner from './components/LoadingSpinner';
 import LoginModal from './components/LoginModal';
 import Dashboard from './components/Dashboard';
-import styles from './App.module.css';
+import GenericFinder from './components/GenericFinder';
+import Footer from './components/Footer';
 
 const API_BASE = '/api';
 
 export default function App() {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('medverify_theme') || 'dark';
+    return localStorage.getItem('medverify_theme') || 'light';
   });
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem('medverify_theme', theme);
   }, [theme]);
 
@@ -30,20 +35,10 @@ export default function App() {
   const [error, setError] = useState(null);
   const [hasImage, setHasImage] = useState(false);
 
-  const [showPreloader, setShowPreloader] = useState(true);
-
-  // Welcome Preloader screen timeout
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowPreloader(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
-
   // Authentication and view states
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [currentView, setCurrentView] = useState('verify'); // 'verify' | 'history'
+  const [currentView, setCurrentView] = useState('verify'); // 'verify' | 'history' | 'generic'
   const [isSaved, setIsSaved] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -71,7 +66,6 @@ export default function App() {
           setCurrentView('verify');
         }
         
-        // Fetch latest profile & points
         fetch(`${API_BASE}/auth/me`, {
           headers: { 'Authorization': `Bearer ${savedToken}` }
         })
@@ -85,7 +79,6 @@ export default function App() {
         .catch(err => console.error('Failed to sync profile:', err));
         
       } catch (e) {
-        console.error('Failed to parse saved user:', e);
         localStorage.removeItem('medverify_user');
         localStorage.removeItem('medverify_token');
         setCurrentView('verify');
@@ -96,11 +89,9 @@ export default function App() {
 
     if (promptLogin === 'true' || (viewParam === 'history' && !isUserLoggedIn)) {
       setIsLoginModalOpen(true);
-      // Clean up URL parameters to keep it clean
       const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
       window.history.replaceState({ path: newUrl }, '', newUrl);
     } else if (viewParam) {
-      // Clean up URL parameters after loading the view
       const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
       window.history.replaceState({ path: newUrl }, '', newUrl);
     }
@@ -113,7 +104,6 @@ export default function App() {
     localStorage.setItem('medverify_token', sessionToken);
     setIsLoginModalOpen(false);
     
-    // Auto-save guest research after successful login
     if (result && !isSaved) {
       await autoSaveReport(result, sessionToken);
     }
@@ -142,10 +132,7 @@ export default function App() {
       const data = await res.json();
       if (res.ok) {
         setIsSaved(true);
-        if (data.report) {
-          // Update the local result state to include the enriched id/savedAt
-          setResult(data.report);
-        }
+        if (data.report) setResult(data.report);
         if (data.newTotalPoints !== undefined) {
           setUser(prev => {
             const updatedUser = { ...prev, points: data.newTotalPoints };
@@ -176,12 +163,8 @@ export default function App() {
     try {
       const response = await fetch(`${API_BASE}/verify`, {
         method: 'POST',
-        body: isFormData
-          ? payload
-          : JSON.stringify(payload),
-        headers: isFormData
-          ? {}
-          : { 'Content-Type': 'application/json' }
+        body: isFormData ? payload : JSON.stringify(payload),
+        headers: isFormData ? {} : { 'Content-Type': 'application/json' }
       });
 
       const data = await response.json();
@@ -192,12 +175,10 @@ export default function App() {
 
       setResult(data);
 
-      // Auto-save search to sandbox if user is logged in
       if (token) {
         await autoSaveReport(data, token);
       }
 
-      // Scroll to top for loading and results
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 50);
@@ -222,7 +203,6 @@ export default function App() {
     setIsSaved(true);
     setCurrentView('verify');
 
-    // Scroll to top
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 50);
@@ -244,35 +224,43 @@ export default function App() {
     }
   };
 
+  // Setup intersection observer for scroll animations
+  useEffect(() => {
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.remove('opacity-0', 'translate-y-8');
+                entry.target.classList.add('opacity-100', 'translate-y-0');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.scroll-element').forEach((el) => {
+        observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [currentView, result]);
 
 
   return (
-    <div className={styles.app}>
-      {showPreloader && (
-        <div className={styles.preloader} aria-hidden="true">
-          <div className={styles.preloaderLogo}>
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#preloadGrad)"/>
-              <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#preloadGrad)"/>
-              <circle cx="28" cy="28" r="10" fill="var(--bg-deep)"/>
-              <circle cx="28" cy="28" r="9" fill="url(#preloadGrad2)"/>
-              <path d="M24 28.5l2.5 2.5 5-5" stroke="var(--bg-deep)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <defs>
-                <linearGradient id="preloadGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="var(--md-primary)"/>
-                  <stop offset="1" stopColor="var(--md-secondary)"/>
-                </linearGradient>
-                <linearGradient id="preloadGrad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="var(--md-primary)"/>
-                  <stop offset="1" stopColor="var(--md-primary-dim)"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <h1 className={styles.preloaderTitle}>Med-Verify <span className={styles.proBadge}>PRO</span></h1>
-          <p className={styles.preloaderText}>Securing Clinical Synthesis Tunnel...</p>
-        </div>
-      )}
+    <div className="font-body bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container relative overflow-x-hidden">
+      {/* Global Animated Mesh Background */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="mesh-blob bg-primary/30 dark:bg-primary/20 w-[600px] h-[600px] rounded-full top-[-10%] left-[-10%] animate-float-sexy" style={{ animationDelay: '0s' }}></div>
+        <div className="mesh-blob bg-tertiary/25 dark:bg-tertiary/20 w-[800px] h-[800px] rounded-full bottom-[-20%] right-[-10%] animate-sexy-pulse" style={{ animationDelay: '-5s' }}></div>
+        <div className="mesh-blob bg-secondary/25 dark:bg-secondary/20 w-[500px] h-[500px] rounded-full top-[40%] left-[30%] animate-float-sexy" style={{ animationDelay: '-10s' }}></div>
+      </div>
+
+      {/* Main app content with elevated z-index */}
+      <div className="relative z-10 flex flex-col flex-grow">
       <Header 
         user={user}
         activeView={currentView}
@@ -284,13 +272,7 @@ export default function App() {
         onSignInClick={() => setIsLoginModalOpen(true)}
       />
 
-      <main className={
-        currentView === 'verify' && isLoading 
-          ? styles.mainLoading 
-          : currentView === 'verify' && !result 
-            ? `${styles.main} ${styles.mainLanding}` 
-            : styles.main
-      }>
+      <main className="flex-grow pt-20 flex flex-col items-center">
         {currentView === 'history' && token && (
           <Dashboard 
             userToken={token}
@@ -299,104 +281,186 @@ export default function App() {
           />
         )}
 
+        {currentView === 'generic' && (
+          <GenericFinder theme={theme} />
+        )}
+
         {currentView === 'verify' && (
           <>
-            {/* Input & Hero split grid section — hidden while showing results */}
+            {/* Landing / Hero view (hidden when verifying or showing results) */}
             {!result && !isLoading && (
-              <div className={`${styles.landingGrid} animate-fade-up`}>
-                {/* Left Column: Hero Content */}
-                <div className={styles.heroColumn}>
-                  <div className={styles.heroTag}>🔬 AI-Powered Medical Verification</div>
-                  <h1 className={styles.heroTitle}>
-                    Fight Medical<br/>
-                    <span className={styles.heroGradient}>Misinformation</span>
-                  </h1>
-                  <p className={styles.heroDesc}>
-                    Verify health claims from social media against authoritative WHO data, 
-                    evidence-based guidelines from the US Department of Health, and 
-                    cutting-edge AI reasoning — in seconds.
-                  </p>
-                  <div className={styles.heroStats}>
-                    <div className={styles.stat}>
-                      <span className={styles.statNum}>WHO</span>
-                      <span className={styles.statLabel}>Global Health Data</span>
-                    </div>
-                    <div className={styles.statDivider}/>
-                    <div className={styles.stat}>
-                      <span className={styles.statNum}>ODPHP</span>
-                      <span className={styles.statLabel}>Evidence-Based Guidelines</span>
-                    </div>
-                    <div className={styles.statDivider}/>
-                    <div className={styles.stat}>
-                      <span className={styles.statNum}>Gemini</span>
-                      <span className={styles.statLabel}>AI Reasoning</span>
-                    </div>
+              <>
+                <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
+                  {/* Atmospheric background elements */}
+                  <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-container/20 rounded-full blur-3xl mix-blend-multiply opacity-50"></div>
+                    <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-secondary-container/30 rounded-full blur-3xl mix-blend-multiply opacity-50"></div>
                   </div>
-                </div>
+                  
+                  <div className="relative z-10 max-w-4xl mx-auto text-center animate-fade-in-up">
+                    <h1 className="font-headline text-6xl md:text-8xl font-normal leading-[1.1] tracking-tight mb-6 drop-shadow-sm animate-fade-in-up text-on-surface text-center">
+                        <span className="text-gradient-primary inline-block" style={{ backgroundSize: '200% auto', animation: 'shimmer 4s linear infinite' }}>Truth in Medicine,</span><br />
+                        <span className="italic text-primary inline-block mt-2" style={{ textShadow: '0 0 20px rgba(194,101,42,0.4)' }}>Beautifully Verified.</span>
+                    </h1>
+                    <p className="font-body text-xl md:text-2xl text-on-surface-variant mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+                        Cut through the noise. Paste any medical claim below to instantly check its validity against the world's most authoritative healthcare databases.
+                    </p>
 
-                {/* Right Column: Search Input Panel */}
-                <div className={styles.searchColumn}>
-                  <section className={styles.inputSection} aria-label="Claim verification input">
-                    <div className={styles.tabGroup}>
-                      <button
-                        id="tab-text"
-                        className={`tab-btn ${activeTab === 'text' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('text')}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-                        </svg>
-                        Type a Claim
-                      </button>
-                      <button
-                        id="tab-image"
-                        className={`tab-btn ${activeTab === 'image' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('image')}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                        </svg>
-                        Upload Screenshot
-                      </button>
-                    </div>
-
-                    <div className={styles.inputPanel}>
-                      {activeTab === 'text' ? (
-                        <ClaimInput onVerify={handleVerify} isLoading={isLoading} />
-                      ) : (
-                        <ImageUpload onVerify={handleVerify} isLoading={isLoading} />
-                      )}
+                    {/* Quirky Verification Input Container */}
+                    <div className="max-w-3xl mx-auto relative group animate-float-sexy">
+                        <div className="absolute -inset-2 bg-gradient-to-r from-primary/40 via-tertiary/40 to-primary/40 rounded-xl blur-lg opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-300 animate-shimmer" style={{ backgroundSize: '200% auto' }}></div>
+                        <div className="relative bg-surface rounded-xl flex flex-col shadow-float hand-drawn-border p-2 transform transition-transform group-hover:scale-[1.01]">
+                           
+                           {/* Tabs */}
+                           <div className="flex gap-4 p-2 border-b border-outline-variant/30 mb-2">
+                               <button 
+                                 onClick={() => setActiveTab('text')}
+                                 className={`px-4 py-1 font-body text-sm rounded-full transition-colors ${activeTab === 'text' ? 'bg-primary/10 text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-variant/50'}`}
+                               >
+                                 Type a Claim
+                               </button>
+                               <button 
+                                 onClick={() => setActiveTab('image')}
+                                 className={`px-4 py-1 font-body text-sm rounded-full transition-colors ${activeTab === 'image' ? 'bg-primary/10 text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-variant/50'}`}
+                               >
+                                 Upload Screenshot
+                               </button>
+                           </div>
+                           
+                           {/* Input forms */}
+                           {activeTab === 'text' ? (
+                             <ClaimInput onVerify={handleVerify} isLoading={isLoading} />
+                           ) : (
+                             <ImageUpload onVerify={handleVerify} isLoading={isLoading} />
+                           )}
+                           
+                        </div>
                     </div>
 
                     {error && (
-                      <div className={styles.errorBox} role="alert">
-                        <div className={styles.errorTitle}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff5e7d" strokeWidth="2" strokeLinecap="round">
-                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-                          </svg>
-                          Error
-                        </div>
-                        <p className={styles.errorText}>{error}</p>
-                        <div className={styles.errorHint}>
-                          💡 Make sure the backend server is running: <code>node server/index.js</code>
+                      <div className="mt-6 bg-error-container text-on-error-container px-6 py-4 rounded-xl max-w-2xl mx-auto text-left border border-error/20 flex items-start gap-4">
+                        <span className="material-symbols-outlined text-error mt-0.5">error</span>
+                        <div>
+                          <p className="font-bold">{error}</p>
+                          <p className="text-sm mt-1 opacity-80">💡 Make sure the backend server is running: `node server/index.js`</p>
                         </div>
                       </div>
                     )}
-                  </section>
-                </div>
-              </div>
+
+                    <div className="mt-8 flex items-center justify-center gap-2 text-sm text-on-surface-variant font-body">
+                        <span className="material-symbols-outlined text-[16px] text-tertiary">security</span>
+                        Bank-level encryption. Your queries are private.
+                    </div>
+                  </div>
+                </section>
+
+                {/* Authoritative Sources */}
+                <section className="w-full py-24 bg-surface-container-low border-y border-outline-variant/30">
+                    <div className="max-w-6xl mx-auto px-6 text-center">
+                        <h2 className="font-headline text-2xl text-on-surface-variant mb-12 uppercase tracking-widest">Anchored in Authority</h2>
+                        <div className="flex flex-wrap justify-center items-center gap-16 md:gap-32 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                            
+                            <div className="flex items-center gap-4 group scroll-element transition-all duration-700 ease-out opacity-0 translate-y-8">
+                                <div className="w-16 h-16 rounded-full border-2 border-primary/30 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                                    <span className="material-symbols-outlined text-3xl">public</span>
+                                </div>
+                                <div className="text-left">
+                                    <div className="font-headline font-bold text-xl text-on-surface">WHO</div>
+                                    <div className="text-xs text-on-surface-variant tracking-wider uppercase">Data Partner</div>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-4 group scroll-element transition-all duration-700 delay-100 ease-out opacity-0 translate-y-8">
+                                <div className="w-16 h-16 rounded-full border-2 border-primary/30 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                                    <span className="material-symbols-outlined text-3xl">health_and_safety</span>
+                                </div>
+                                <div className="text-left">
+                                    <div className="font-headline font-bold text-xl text-on-surface">CDC</div>
+                                    <div className="text-xs text-on-surface-variant tracking-wider uppercase">Reference Database</div>
+                                </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-4 group scroll-element transition-all duration-700 delay-200 ease-out opacity-0 translate-y-8">
+                                <div className="w-16 h-16 rounded-full border-2 border-primary/30 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                                    <span className="material-symbols-outlined text-3xl">local_library</span>
+                                </div>
+                                <div className="text-left">
+                                    <div className="font-headline font-bold text-xl text-on-surface">PubMed</div>
+                                    <div className="text-xs text-on-surface-variant tracking-wider uppercase">Clinical Trials</div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </section>
+
+                {/* Bento Grid Feature Section */}
+                <section className="w-full py-32 px-6">
+                    <div className="max-w-6xl mx-auto">
+                        <div className="text-center mb-16 scroll-element opacity-0 translate-y-8 transition-all duration-700">
+                            <h2 className="font-headline text-4xl md:text-5xl text-on-surface mb-4">Clarity in an age of confusion.</h2>
+                            <p className="font-body text-xl text-on-surface-variant max-w-2xl mx-auto">Our methodology is transparent, rigorous, and designed to surface the truth.</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+                            {/* Bento Box 1 */}
+                            <div className="md:col-span-2 bg-surface-container-low rounded-3xl p-8 flex flex-col justify-end relative overflow-hidden shadow-soft border border-outline-variant/20 hover:border-primary/40 hover:shadow-float hover:-translate-y-1 transition-all duration-300 group scroll-element opacity-0 translate-y-8 delay-100">
+                                <div className="absolute top-0 right-0 p-8 transform transition-transform group-hover:scale-110 group-hover:rotate-12">
+                                    <span className="material-symbols-outlined text-5xl text-primary/20 group-hover:text-primary/60 transition-colors group-hover:animate-sexy-pulse">psychology</span>
+                                </div>
+                                <h3 className="font-headline text-3xl text-on-surface mb-2 group-hover:text-primary transition-colors">Contextual AI Analysis</h3>
+                                <p className="font-body text-on-surface-variant max-w-md">We don't just keyword match. Our models understand nuance, severity, and medical context before cross-referencing literature.</p>
+                            </div>
+                            
+                            {/* Bento Box 2 */}
+                            <div className="bg-surface-container-highest rounded-3xl p-8 flex flex-col justify-end relative overflow-hidden shadow-soft border border-outline-variant/20 hover:border-primary/30 transition-colors group scroll-element opacity-0 translate-y-8 transition-all duration-700 delay-200">
+                                <div className="absolute top-0 right-0 p-8">
+                                    <span className="material-symbols-outlined text-5xl text-tertiary/20 group-hover:text-tertiary/40 transition-colors">speed</span>
+                                </div>
+                                <h3 className="font-headline text-2xl text-on-surface mb-2">Real-time Updates</h3>
+                                <p className="font-body text-on-surface-variant">Medical consensus evolves. So do our verdicts.</p>
+                            </div>
+                            
+                            {/* Bento Box 3 */}
+                            <div className="bg-primary-container/10 rounded-3xl p-8 flex flex-col justify-end relative overflow-hidden shadow-soft border border-primary/20 hover:border-primary/40 transition-colors group scroll-element opacity-0 translate-y-8 transition-all duration-700 delay-100">
+                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <div className="absolute top-0 right-0 p-8">
+                                    <span className="material-symbols-outlined text-5xl text-primary/40">verified_user</span>
+                                </div>
+                                <h3 className="font-headline text-2xl text-on-surface mb-2">Immutable Audit Trail</h3>
+                                <p className="font-body text-on-surface-variant">Every fact-check is archived with cryptographic proof of the sources referenced.</p>
+                            </div>
+                            
+                            {/* Bento Box 4 */}
+                            <div className="md:col-span-2 bg-surface-container-low rounded-3xl p-8 flex flex-col justify-center items-center text-center relative overflow-hidden shadow-soft border border-outline-variant/20 hover:border-primary/40 group scroll-element opacity-0 translate-y-8 transition-all duration-700 delay-200 hover:scale-[1.02] hover:shadow-float">
+                                <div className="absolute -inset-4 bg-gradient-to-tr from-transparent via-primary/5 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-opacity" style={{ backgroundSize: '200% auto' }}></div>
+                                <div className="w-full max-w-md h-48 bg-surface rounded-xl shadow-inner flex items-center justify-center p-6 hand-drawn-border mb-6 group-hover:animate-sexy-pulse">
+                                    <div className="flex items-start gap-4 transform transition-transform group-hover:scale-105">
+                                        <span className="material-symbols-outlined text-error text-3xl animate-heartbeat">cancel</span>
+                                        <div className="text-left">
+                                            <div className="font-headline text-xl text-on-surface line-through decoration-error decoration-2 group-hover:text-error transition-colors">"Vitamin C cures the common cold instantly."</div>
+                                            <div className="font-body text-sm text-on-surface-variant mt-2 bg-error-container text-on-error-container px-3 py-1 rounded-full inline-block shadow-sm">Misleading - No Clinical Evidence</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3 className="font-headline text-2xl text-on-surface mb-2 relative z-10 group-hover:text-primary transition-colors">See the proof, beautifully presented.</h3>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+              </>
             )}
 
             {/* Loading state */}
             {isLoading && (
-              <section className={styles.loadingSection} aria-live="polite">
+              <section className="w-full max-w-5xl flex flex-col items-center justify-center py-32 min-h-[60vh]">
                 <LoadingSpinner hasImage={hasImage} />
               </section>
             )}
 
             {/* Results */}
             {result && !isLoading && (
-              <section className={styles.resultSection} aria-label="Fact-check results">
+              <section className="w-full">
                 <ResultCard 
                   result={result} 
                   onReset={handleReset} 
@@ -407,30 +471,14 @@ export default function App() {
                 />
               </section>
             )}
-
-
           </>
         )}
       </main>
 
-      {!isLoading && (
-        <>
-          <footer className={styles.footer}>
-            <div className={styles.footerContainer}>
-              <p className={styles.footerText}>
-                © 2026 Med-Verify Systems, Inc. All rights reserved. 
-                Synthesizing secure, authoritative clinical data from{' '}
-                <a href="https://www.who.int/data/gho" target="_blank" rel="noopener noreferrer">WHO GHO</a>,{' '}
-                <a href="https://odphp.health.gov/myhealthfinder" target="_blank" rel="noopener noreferrer">MyHealthfinder</a>,{' '}
-                <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer">PubMed</a>,{' '}
-                <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener noreferrer">ClinicalTrials.gov</a>,{' '}
-                and <a href="https://open.fda.gov/" target="_blank" rel="noopener noreferrer">OpenFDA</a>. 
-                All clinical verification pipelines are compliant under HIPAA guidelines.
-              </p>
-            </div>
-          </footer>
-        </>
-      )}
+      {!isLoading && <Footer />}
+
+      </div> {/* End of z-10 container */}
+
       <LoginModal 
         isOpen={isLoginModalOpen} 
         onClose={() => setIsLoginModalOpen(false)} 

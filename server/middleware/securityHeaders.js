@@ -47,7 +47,7 @@ function securityHeaders(req, res, next) {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
 
   // 6. Hard Limit Hardware and Device API Access
-  res.setHeader('Permissions-Policy', 'geolocation=(), camera=(), microphone=()');
+  res.setHeader('Permissions-Policy', 'geolocation=(self), camera=(self), microphone=()');
 
   // 7. Prevent Browser Caching of sensitive endpoint responses (HIPAA standard)
   if (req.path.startsWith('/api/verify') || req.path.startsWith('/api/history') || req.path.startsWith('/api/auth/me')) {

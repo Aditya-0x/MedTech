@@ -9,8 +9,6 @@ const mongoose = require('mongoose');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_development';
 
-// In-memory OTP store (email -> { otp, expiresAt })
-const otps = new Map();
 
 // Helper to decode JWT from Google
 function decodeJwt(token) {
@@ -50,26 +48,20 @@ router.post('/auth/send-otp', async (req, res) => {
 
     // Check if user is offline or online
     const dbOnline = await ensureDbConnected();
-    let existingUser = false;
-    if (dbOnline) {
-      const user = await User.findOne({ email: email.toLowerCase() });
-      existingUser = !!user;
-    } else {
-      // In sandbox mode/offline mode, pretend user exists if it contains sandbox
-      existingUser = email.toLowerCase().includes('sandbox') || email.toLowerCase().includes('test');
+    if (!dbOnline) {
+      return res.status(503).json({ error: 'Database service is currently unavailable. Please try again later.' });
     }
+    
+    const user = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = !!user;
 
     // Generate secure 6-digit OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    if (dbOnline) {
-      // Purge any existing codes for this user to avoid duplication
-      await Otp.deleteMany({ email: email.toLowerCase() });
-      await Otp.create({ email: email.toLowerCase(), otp: otpCode });
-    } else {
-      otps.set(email.toLowerCase(), { otp: otpCode, expiresAt });
-    }
+    // Purge any existing codes for this user to avoid duplication
+    await Otp.deleteMany({ email: email.toLowerCase() });
+    await Otp.create({ email: email.toLowerCase(), otp: otpCode });
     console.log(`🔑 OTP generated for ${email}: ${otpCode}`);
 
     // Send email with OTP
@@ -98,44 +90,20 @@ router.post('/auth/verify-otp', async (req, res) => {
 
     const emailKey = email.toLowerCase();
     const dbOnline = await ensureDbConnected();
-
-    let otpVerified = false;
-
-    if (dbOnline) {
-      const otpDoc = await Otp.findOne({ email: emailKey });
-      if (otpDoc && otpDoc.otp === otp.trim()) {
-        otpVerified = true;
-        // Purge the used code immediately
-        await Otp.deleteOne({ _id: otpDoc._id });
-      }
+    if (!dbOnline) {
+      return res.status(503).json({ error: 'Database service is currently unavailable.' });
     }
 
-    // Fallback to local memory map verification if database did not have it
-    if (!otpVerified) {
-      const otpEntry = otps.get(emailKey);
-      if (otpEntry) {
-        if (otpEntry.otp === otp.trim() && Date.now() <= otpEntry.expiresAt) {
-          otpVerified = true;
-          otps.delete(emailKey);
-        }
-      }
+    const otpDoc = await Otp.findOne({ email: emailKey });
+    let otpVerified = false;
+    if (otpDoc && otpDoc.otp === otp.trim()) {
+      otpVerified = true;
+      // Purge the used code immediately
+      await Otp.deleteOne({ _id: otpDoc._id });
     }
 
     if (!otpVerified) {
       return res.status(400).json({ error: 'Invalid or expired verification code. Please check your email and try again.' });
-    }
-
-    if (!dbOnline) {
-      console.warn('⚠️ MongoDB is offline. Generating mock user session for testing.');
-      const mockUser = {
-        _id: 'mock-id-' + Math.floor(Math.random() * 10000),
-        name: name || 'Sandbox Clinician',
-        email: emailKey,
-        points: 0,
-        picture: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop&q=80'
-      };
-      const token = generateToken(mockUser);
-      return res.json({ success: true, token, user: mockUser });
     }
 
     // Find or create the user in MongoDB
@@ -205,9 +173,7 @@ router.post('/auth/google', async (req, res) => {
 
     const dbOnline = await ensureDbConnected();
     if (!dbOnline) {
-      console.warn('⚠️ MongoDB is offline. Serving mock Google OAuth sandbox session.');
-      const mockUser = { _id: payloadData.sub, name: payloadData.name, email: payloadData.email, points: 0, picture: payloadData.picture };
-      return res.json({ success: true, token: generateToken(mockUser), user: mockUser });
+      return res.status(503).json({ error: 'Database service is currently unavailable.' });
     }
 
     // Find or create user in MongoDB
@@ -255,7 +221,7 @@ const authenticateToken = (req, res, next) => {
 router.get('/auth/me', authenticateToken, async (req, res) => {
   const dbOnline = await ensureDbConnected();
   if (!dbOnline) {
-    return res.json({ success: true, user: req.user });
+    return res.status(503).json({ error: 'Database service is currently unavailable.' });
   }
   const user = await User.findById(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });

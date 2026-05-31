@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './LoadingSpinner.module.css';
 
 const STEPS = [
   { id: 1, icon: '👁', label: 'OCR Processing', sublabel: 'Mistral OCR extracting text from image...' },
@@ -10,53 +9,45 @@ const STEPS = [
 
 export default function LoadingSpinner({ hasImage = false }) {
   return (
-    <div className={styles.container} role="status" aria-label="Verifying claim...">
-      <div className={styles.orb}>
-        <div className={styles.orbInner}>
-          <div className={styles.orbCore}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="url(#orbGrad)" strokeWidth="1.5"/>
-              <path d="M8 12h8M12 8v8" stroke="url(#orbGrad)" strokeWidth="2" strokeLinecap="round"/>
-              <defs>
-                <linearGradient id="orbGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="var(--md-primary)"/>
-                  <stop offset="1" stopColor="var(--md-secondary)"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
+    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-8 bg-surface-container-low/50 rounded-2xl border border-outline-variant/50 animate-fade-in-up" role="status" aria-label="Verifying claim...">
+      
+      {/* Orb */}
+      <div className="relative w-32 h-32 flex items-center justify-center mb-8">
+        <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-75"></div>
+        <div className="absolute inset-2 bg-tertiary/30 rounded-full animate-pulse opacity-75"></div>
+        <div className="relative z-10 w-16 h-16 bg-surface rounded-full flex items-center justify-center shadow-lg border border-primary/30 text-primary">
+            <span className="material-symbols-outlined text-4xl animate-spin">autorenew</span>
         </div>
-        <div className={styles.ring1}/>
-        <div className={styles.ring2}/>
-        <div className={styles.ring3}/>
       </div>
 
-      <div className={styles.text}>
-        <h3 className={styles.title}>Analyzing Medical Claim</h3>
-        <p className={styles.subtitle}>Cross-referencing against authoritative sources...</p>
+      <div className="text-center mb-10">
+        <h3 className="font-headline text-2xl text-on-surface mb-2">Analyzing Medical Claim</h3>
+        <p className="font-body text-on-surface-variant">Cross-referencing against authoritative sources...</p>
       </div>
 
-      <div className={styles.steps}>
+      <div className="w-full flex flex-col gap-4">
         {STEPS.filter(s => hasImage || s.id !== 1).map((step, i) => (
-          <div key={step.id} className={styles.step} style={{ animationDelay: `${i * 0.15}s` }}>
-            <div className={styles.stepIconWrap}>
-              <span className={styles.stepIcon}>{step.icon}</span>
+          <div key={step.id} className="flex items-center gap-4 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/60 relative overflow-hidden group">
+            
+            <div className="absolute bottom-0 left-0 h-1 bg-primary/20 w-full">
+                <div className="h-full bg-primary animate-pulse w-1/2"></div>
             </div>
-            <div className={styles.stepContent}>
-              <div className={styles.stepLabel}>{step.label}</div>
-              <div className={styles.stepSublabel}>{step.sublabel}</div>
-              <div className={styles.stepBar}>
-                <div className={styles.stepBarFill} style={{ animationDelay: `${i * 0.4}s` }}/>
-              </div>
+
+            <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-surface-variant/50 rounded-full text-xl">
+              {step.icon}
             </div>
-            <div className={styles.stepStatus}>
-              <div className={styles.statusDot}/>
+            
+            <div className="flex-1">
+              <div className="font-headline text-on-surface font-semibold">{step.label}</div>
+              <div className="font-body text-xs text-on-surface-variant">{step.sublabel}</div>
             </div>
+            
+            <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin"></div>
           </div>
         ))}
       </div>
 
-      <div className={styles.disclaimer}>
+      <div className="mt-8 font-body text-xs text-secondary text-center bg-surface-variant/30 px-4 py-2 rounded-full">
         🔒 Your data is processed securely · Results are for educational purposes only
       </div>
     </div>

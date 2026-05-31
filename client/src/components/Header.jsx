@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import styles from './Header.module.css';
 
 export default function Header({ user, activeView, onViewChange, onLogout, showHero, theme, onToggleTheme, onSignInClick }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,233 +19,150 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
   };
 
   return (
-    <header className={styles.header}>
-      {/* Top bar */}
-      <div className={styles.topBar}>
-        <div 
-          className={styles.logo} 
-          onClick={() => handleNavClick('verify')} 
-          style={{ cursor: 'pointer' }}
+    <header className="fixed top-0 w-full z-50 flex justify-between items-center px-10 h-20 glass-panel shadow-sm transition-all duration-300 ease-in-out">
+      <div className="flex items-center gap-16">
+          <a 
+            className="font-headline text-3xl font-bold text-gradient-primary drop-shadow-sm tracking-tight cursor-pointer mr-4 hover:scale-105 transition-transform duration-300" 
+          onClick={() => handleNavClick('verify')}
         >
-          <div className={styles.logoIcon}>
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Cross */}
-              <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#grad1)"/>
-              <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#grad1)"/>
-              {/* Checkmark overlay */}
-              <circle cx="28" cy="28" r="10" fill="var(--bg-deep)"/>
-              <circle cx="28" cy="28" r="9" fill="url(#grad2)"/>
-              <path d="M24 28.5l2.5 2.5 5-5" stroke="var(--bg-deep)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <defs>
-                <linearGradient id="grad1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="var(--md-primary)"/>
-                  <stop offset="1" stopColor="var(--md-secondary)"/>
-                </linearGradient>
-                <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="var(--md-primary)"/>
-                  <stop offset="1" stopColor="var(--md-primary-dim)"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div className={styles.logoText}>
-            <span className={styles.logoMain}>Med<span className={styles.logoDash}>-</span>Verify</span>
-            <span className={styles.logoSub}>Clinical Fact-Checking Agent</span>
-          </div>
-        </div>
-
-        {/* Desktop Navigation (hidden on mobile) */}
-        <nav className={styles.navigation}>
+          MedVerify
+        </a>
+        <nav className="hidden md:flex items-center gap-10">
           <button
-            className={`${styles.navTab} ${activeView === 'verify' ? styles.activeTab : ''}`}
+            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'verify' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
             onClick={() => handleNavClick('verify')}
           >
-            🔬 Verify
+            Claims
           </button>
           <button
-            className={`${styles.navTab} ${activeView === 'history' ? styles.activeTab : ''}`}
+            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'generic' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
+            onClick={() => handleNavClick('generic')}
+          >
+            TruMeds
+          </button>
+          <button
+            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'history' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
             onClick={() => user ? handleNavClick('history') : onSignInClick()}
           >
-            📊 History {!user && '🔒'}
+            Archive {!user && '🔒'}
           </button>
           <button
-            className={`${styles.navTab} ${activeView === 'about' ? styles.activeTab : ''}`}
+            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'about' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
             onClick={() => handleNavClick('about')}
           >
-            👨‍⚕️ About
+            Methodology
           </button>
           <button
-            className={`${styles.navTab} ${activeView === 'contact' ? styles.activeTab : ''}`}
+            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'contact' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
             onClick={() => handleNavClick('contact')}
           >
-            💬 Support
+            Contact
           </button>
         </nav>
-
-        {/* Desktop Controls (hidden on mobile) */}
-        <div className={styles.rightSection}>
-          <button 
-            className={styles.themeToggle} 
-            onClick={onToggleTheme} 
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            aria-label="Toggle Light/Dark Theme"
-          >
-            {theme === 'dark' ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
-            )}
-          </button>
-
-          {user ? (
-            <>
-              <div className={styles.userProfile}>
-                <div className={styles.pointsBadge} title="Gamification Points">
-                  ✨ {user.points !== undefined ? user.points : 0} pts
-                </div>
-                <img 
-                  src={user.picture} 
-                  alt={user.name} 
-                  className={styles.avatar} 
-                  referrerPolicy="no-referrer"
-                  title={user.name}
-                />
-                <span className={styles.userName}>{user.name}</span>
-              </div>
-              <button 
-                className={styles.logoutBtn} 
-                onClick={handleLogoutClick} 
-                title="Log Out"
-                aria-label="Log Out"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-              </button>
-            </>
-          ) : (
-            <div className={styles.guestRightSection}>
-              <button className={styles.signInBtn} onClick={handleSignIn}>
-                ✨ Join Pro / Sign In
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Mobile controls (visible only on mobile) */}
-        <div className={styles.mobileControls}>
-          <button 
-            className={`${styles.themeToggle} ${styles.mobileThemeToggle}`} 
-            onClick={onToggleTheme} 
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            aria-label="Toggle Light/Dark Theme"
-          >
-            {theme === 'dark' ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-            ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
-            )}
-          </button>
-
-          <button
-            className={`${styles.hamburger} ${isMenuOpen ? styles.hamburgerActive : ''}`}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle Menu"
-            aria-expanded={isMenuOpen}
-          >
-            <span className={styles.hamburgerLine}></span>
-            <span className={styles.hamburgerLine}></span>
-            <span className={styles.hamburgerLine}></span>
-          </button>
-        </div>
       </div>
 
-      {/* Mobile Glassmorphic Dropdown Panel */}
-      <div className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ''}`}>
-        <nav className={styles.mobileNavigation}>
-          <button
-            className={`${styles.mobileNavTab} ${activeView === 'verify' ? styles.mobileActiveTab : ''}`}
+      <div className="flex items-center gap-6">
+        <button 
+          className="text-on-surface-variant hover:text-primary transition-colors"
+          onClick={onToggleTheme}
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? (
+            <span className="material-symbols-outlined text-2xl">light_mode</span>
+          ) : (
+            <span className="material-symbols-outlined text-2xl">dark_mode</span>
+          )}
+        </button>
+
+        {user ? (
+          <div className="hidden md:flex items-center gap-4">
+             <div className="font-body text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+               ✨ {user.points !== undefined ? user.points : 0} pts
+             </div>
+             <img 
+               src={user.picture} 
+               alt={user.name} 
+               className="w-8 h-8 rounded-full border border-outline-variant"
+               referrerPolicy="no-referrer"
+               title={user.name}
+             />
+             <button 
+               className="text-on-surface-variant hover:text-error transition-colors"
+               onClick={handleLogoutClick}
+               title="Log Out"
+             >
+               <span className="material-symbols-outlined text-2xl">logout</span>
+             </button>
+          </div>
+        ) : (
+          <button 
+            className="hidden md:flex items-center justify-center bg-primary text-on-primary px-6 py-2.5 rounded-lg font-body text-sm font-semibold hover:bg-primary/90 transition-colors duration-300 shadow-[0_2px_16px_rgba(58,48,42,0.08)]"
+            onClick={handleSignIn}
+          >
+            Verify Now / Sign In
+          </button>
+        )}
+
+        <button 
+          className="md:hidden text-on-surface"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 0" }}>menu</span>
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="absolute top-20 left-0 w-full bg-background border-b border-outline-variant/60 shadow-lg p-6 flex flex-col gap-4 md:hidden z-40">
+           <button
+            className={`text-left font-body text-lg ${activeView === 'verify' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
             onClick={() => handleNavClick('verify')}
           >
-            🔬 Verify Claim
+            Claims
           </button>
           <button
-            className={`${styles.mobileNavTab} ${activeView === 'history' ? styles.mobileActiveTab : ''}`}
-            onClick={() => user ? handleNavClick('history') : handleSignIn()}
+            className={`text-left font-body text-lg ${activeView === 'generic' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
+            onClick={() => handleNavClick('generic')}
           >
-            📊 Search History {!user && '🔒'}
+            TruMeds
           </button>
           <button
-            className={`${styles.mobileNavTab} ${activeView === 'about' ? styles.mobileActiveTab : ''}`}
+            className={`text-left font-body text-lg ${activeView === 'history' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
+            onClick={() => user ? handleNavClick('history') : onSignInClick()}
+          >
+            Archive {!user && '🔒'}
+          </button>
+          <button
+            className={`text-left font-body text-lg ${activeView === 'about' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
             onClick={() => handleNavClick('about')}
           >
-            👨‍⚕️ About Creator
+            Methodology
           </button>
           <button
-            className={`${styles.mobileNavTab} ${activeView === 'contact' ? styles.mobileActiveTab : ''}`}
+            className={`text-left font-body text-lg ${activeView === 'contact' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
             onClick={() => handleNavClick('contact')}
           >
-            💬 Contact Support
+            Contact
           </button>
-        </nav>
-
-        <div className={styles.mobileMenuDivider} />
-
-        <div className={styles.mobileProfileSection}>
+          <hr className="border-outline-variant/30 my-2" />
           {user ? (
-            <div className={styles.mobileUserContainer}>
-              <div className={styles.mobileUserInfo}>
-                <img 
-                  src={user.picture} 
-                  alt={user.name} 
-                  className={styles.mobileAvatar} 
-                  referrerPolicy="no-referrer"
-                />
-                <div className={styles.mobileUserDetails}>
-                  <span className={styles.mobileUserName}>{user.name}</span>
-                  <div className={styles.mobilePointsBadge} title="Gamification Points">
-                    ✨ {user.points !== undefined ? user.points : 0} pts
-                  </div>
-                </div>
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                 <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full" />
+                 <span className="font-body font-medium text-on-surface">{user.name}</span>
               </div>
-              <button 
-                className={styles.mobileLogoutBtn} 
-                onClick={handleLogoutClick}
-                aria-label="Log Out"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" y1="12" x2="9" y2="12" />
-                </svg>
-                <span>Log Out</span>
-              </button>
+              <button onClick={handleLogoutClick} className="text-error">Logout</button>
             </div>
           ) : (
-            <button className={styles.mobileSignInBtn} onClick={handleSignIn}>
-              ✨ Join Pro / Sign In
+            <button 
+              className="w-full bg-primary text-on-primary py-3 rounded-lg font-body font-semibold"
+              onClick={handleSignIn}
+            >
+              Verify Now / Sign In
             </button>
           )}
         </div>
-      </div>
+      )}
     </header>
   );
 }

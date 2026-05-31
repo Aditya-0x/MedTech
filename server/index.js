@@ -6,6 +6,7 @@ const { connectDB } = require('./config/db');
 const verifyRouter = require('./routes/verify');
 const { router: authRouter } = require('./routes/auth');
 const historyRouter = require('./routes/history');
+const genericRouter = require('./routes/generic');
 const securityHeaders = require('./middleware/securityHeaders');
 
 // Connect to MongoDB
@@ -23,6 +24,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use('/api', verifyRouter);
 app.use('/api', authRouter);
 app.use('/api', historyRouter);
+app.use('/api', genericRouter);
 
 // Health check
 app.get('/health', (req, res) => {

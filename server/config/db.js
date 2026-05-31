@@ -19,7 +19,8 @@ const connectDB = async () => {
     if (!cachedConnectionPromise) {
       console.log('🔌 Connecting to MongoDB...');
       cachedConnectionPromise = mongoose.connect(mongoUri, {
-        serverSelectionTimeoutMS: 5000 // 5 seconds timeout
+        serverSelectionTimeoutMS: 15000, // Increased to 15 seconds for flaky DNS
+        family: 4 // Force IPv4 to prevent Node.js Windows SRV resolution bugs
       });
     }
 

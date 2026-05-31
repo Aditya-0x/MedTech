@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import styles from './Login.module.css';
 
 // Register GSAP plugins safely
 gsap.registerPlugin(ScrollTrigger);
@@ -43,7 +42,7 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
 
       // Micro-animations for typography reveal on load
       gsap.fromTo(
-        `.${styles.revealText}`,
+        `.revealText`,
         { opacity: 0, y: 30 },
         {
           opacity: 1,
@@ -174,11 +173,11 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
   };
 
   return (
-    <div ref={containerRef} className={styles.scrollContainer}>
+    <div ref={containerRef} className="scrollContainer">
       
       {/* Floating Theme Toggle */}
       <button 
-        className={styles.themeToggleFloating} 
+        className="themeToggleFloating" 
         onClick={onToggleTheme} 
         title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         aria-label="Toggle Light/Dark Theme"
@@ -199,65 +198,65 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
       </button>
 
       {/* Floating Top Header Overlay */}
-      <header className={styles.headerOverlay}>
-        <div className={styles.headerBrand}>
-          <span className={styles.headerIcon}>🏥</span>
-          <h2 className={styles.headerTitle}>MED-VERIFY PRO</h2>
+      <header className="headerOverlay">
+        <div className="headerBrand">
+          <span className="headerIcon">🏥</span>
+          <h2 className="headerTitle">MED-VERIFY PRO</h2>
         </div>
-        <div className={styles.headerMeta}>
-          <span className={styles.headerTag}>HIPAA SECURED</span>
-          <span className={styles.headerBadge}>M1 HPR Verified</span>
+        <div className="headerMeta">
+          <span className="headerTag">HIPAA SECURED</span>
+          <span className="headerBadge">M1 HPR Verified</span>
         </div>
       </header>
 
       {/* Dynamic Ambient Background Mesh */}
-      <div className={styles.meshBackdrop}>
-        <div className={`${styles.glowCircle} ${styles.cyanCircle}`} />
-        <div className={`${styles.glowCircle} ${styles.purpleCircle}`} />
+      <div className="meshBackdrop">
+        <div className={`glowCircle cyanCircle`} />
+        <div className={`glowCircle purpleCircle`} />
       </div>
 
       {/* Horizontally scrolling slides */}
-      <div ref={scrollSectionRef} className={styles.scrollTrack}>
+      <div ref={scrollSectionRef} className="scrollTrack">
         
         {/* Slide 1: Welcome & Mission narrative */}
-        <section className={styles.slideSection}>
-          <div className={styles.narrativeBlock}>
-            <span className={styles.slideNumber}>01 // System Infrastructure</span>
-            <h2 className={`${styles.revealText} ${styles.slideTitle}`}>
+        <section className="slideSection">
+          <div className="narrativeBlock">
+            <span className="slideNumber">01 // System Infrastructure</span>
+            <h2 className={`revealText slideTitle`}>
               Democratizing <br />
-              <span className={styles.gradientText}>Clinical Veracity</span>
+              <span className="gradientText">Clinical Veracity</span>
             </h2>
-            <p className={`${styles.revealText} ${styles.slideDesc}`}>
+            <p className={`revealText slideDesc`}>
               Synthesizing real-time science indices across global and national channels (WHO, PubMed, ClinicalTrials, OpenFDA) to neutralize medical misinformation instantly.
             </p>
           </div>
-          <div className={styles.scrollIndicator}>
+          <div className="scrollIndicator">
             Scroll down to explore onboarding track →
           </div>
         </section>
 
         {/* Slide 2: Scientific Synthesis Showcase */}
-        <section className={`${styles.slideSection} ${styles.darkSlide}`}>
-          <div className={styles.narrativeBlock}>
-            <span className={styles.slideNumber}>02 // Cognitive Architecture</span>
-            <h2 className={styles.slideTitle}>
+        <section className={`slideSection darkSlide`}>
+          <div className="narrativeBlock">
+            <span className="slideNumber">02 // Cognitive Architecture</span>
+            <h2 className="slideTitle">
               Powered by <br />
-              <span className={styles.gradientText}>Deep-Science Synthesis</span>
+              <span className="gradientText">Deep-Science Synthesis</span>
             </h2>
-            <p className={styles.slideDesc}>
+            <p className="slideDesc">
               Harnesses real-time search synthesis algorithms to cross-reference multi-layered research data and output authoritative clinical verification indexes.
             </p>
           </div>
         </section>
 
         {/* Slide 3: Interactive Glass-morphic Access Card */}
-        <section className={styles.slideSection}>
-          <div className={styles.loginCard}>
+        <section className="slideSection">
+          <div className="loginCard">
             {/* Top refraction edge glow */}
-            <div className={styles.refractionEdge} />
+            <div className="refractionEdge" />
 
-            <div className={styles.brand}>
-              <div className={styles.logoIcon}>
+            <div className="brand">
+              <div className="logoIcon">
                 <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#grad1)"/>
                   <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#grad1)"/>
@@ -276,26 +275,26 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
                   </defs>
                 </svg>
               </div>
-              <h1 className={styles.brandTitle}>Med-Verify <span className={styles.proBadge}>PRO</span></h1>
-              <p className={styles.brandSubtitle}>Clinical Synthesis & Literature Evidence Engine</p>
+              <h1 className="brandTitle">Med-Verify <span className="proBadge">PRO</span></h1>
+              <p className="brandSubtitle">Clinical Synthesis & Literature Evidence Engine</p>
             </div>
 
-            <div className={styles.infoBanner}>
+            <div className="infoBanner">
               🔬 Built for <strong>NBEC 2026</strong>. Auto-synthesize claims against peer-reviewed PubMed articles, ongoing clinical studies, and FDA drug recall logs.
             </div>
 
-            {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
+            {error && <div className="errorAlert">⚠️ {error}</div>}
 
-            <div className={styles.authActions}>
+            <div className="authActions">
               {loading ? (
-                <div className={styles.authLoading}>
-                  <div className={styles.spinner} />
+                <div className="authLoading">
+                  <div className="spinner" />
                   <span>Initializing secure session...</span>
                 </div>
               ) : (
                 <>
                   {/* Traditional Auth Form */}
-                  <div className={styles.authTabs}>
+                  <div className="authTabs">
                     <button 
                       type="button"
                       className={authMode === 'login' ? styles.activeAuthTab : styles.authTab} 
@@ -312,12 +311,12 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
                     </button>
                   </div>
 
-                  <form onSubmit={handleTraditionalAuth} className={styles.traditionalForm}>
+                  <form onSubmit={handleTraditionalAuth} className="traditionalForm">
                     {authMode === 'signup' && (
                       <input 
                         type="text" 
                         placeholder="Full Name" 
-                        className={styles.authInput}
+                        className="authInput"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                         required 
@@ -326,7 +325,7 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
                     <input 
                       type="email" 
                       placeholder="Email Address" 
-                      className={styles.authInput}
+                      className="authInput"
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                       required 
@@ -334,31 +333,31 @@ export default function Login({ onLoginSuccess, theme, onToggleTheme }) {
                     <input 
                       type="password" 
                       placeholder="Password" 
-                      className={styles.authInput}
+                      className="authInput"
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
                       required 
                     />
-                    <button type="submit" className={styles.submitAuthBtn}>
+                    <button type="submit" className="submitAuthBtn">
                       {authMode === 'login' ? 'Sign In ➔' : 'Create Account ➔'}
                     </button>
                   </form>
 
-                  <div className={styles.divider}>
-                    <span className={styles.dividerLine} />
-                    <span className={styles.dividerText}>or continue with</span>
-                    <span className={styles.dividerLine} />
+                  <div className="divider">
+                    <span className="dividerLine" />
+                    <span className="dividerText">or continue with</span>
+                    <span className="dividerLine" />
                   </div>
 
                   {/* Google Sign In Target */}
-                  <div className={styles.googleContainer}>
-                    <div id="google-signin-btn-container" className={styles.googleBtn} />
+                  <div className="googleContainer">
+                    <div id="google-signin-btn-container" className="googleBtn" />
                   </div>
                 </>
               )}
             </div>
 
-            <div className={styles.footerNote}>
+            <div className="footerNote">
               🔒 Secure OAuth authorization. Production ready.
             </div>
           </div>

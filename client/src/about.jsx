@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import Header from './components/Header';
 import About from './components/About';
-import styles from './App.module.css';
+import Footer from './components/Footer';
 import './index.css';
 
 function AboutPage() {
@@ -11,7 +11,11 @@ function AboutPage() {
   });
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
     localStorage.setItem('medverify_theme', theme);
   }, [theme]);
 
@@ -33,7 +37,7 @@ function AboutPage() {
   }, []);
 
   return (
-    <div className={styles.app}>
+    <div className="font-body bg-background text-on-background min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
       <Header 
         user={user}
         activeView="about"
@@ -57,19 +61,11 @@ function AboutPage() {
         }}
       />
 
-      <main className={styles.main}>
+      <main className="flex-grow pt-20 flex flex-col items-center">
         <About />
       </main>
 
-      <footer className={styles.footer}>
-        <div className={styles.footerContainer}>
-          <p className={styles.footerText}>
-            © 2026 Med-Verify Systems, Inc. All rights reserved. 
-            Synthesizing secure, authoritative clinical data from WHO, PubMed, and FDA. 
-            All clinical verification pipelines are compliant under HIPAA guidelines.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

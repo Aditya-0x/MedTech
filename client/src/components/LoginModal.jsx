@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
-import styles from './LoginModal.module.css';
+import React, { useEffect, useState } from 'react';
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onToggleTheme }) {
   const [step, setStep] = useState('email'); // 'email' | 'name' | 'otp'
@@ -10,10 +9,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resendTimer, setResendTimer] = useState(0);
-  const [showSlides, setShowSlides] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(0);
 
-  // 1. Manage Resend OTP Countdown Timer
   useEffect(() => {
     let timer;
     if (resendTimer > 0) {
@@ -24,9 +20,16 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
     return () => clearInterval(timer);
   }, [resendTimer]);
 
-  // 2. Initialize Google Sign-in API GSI side-by-side
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      setStep('email');
+      setEmail('');
+      setOtp('');
+      setName('');
+      setError(null);
+      setLoading(false);
+      return;
+    }
 
     const clientIdEnv = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1047648356984-mockclientid.apps.googleusercontent.com';
     const scriptId = 'google-gsi-client';
@@ -40,23 +43,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
           callback: handleGoogleCredentialResponse,
           auto_select: false
         });
-
-        // Small delay ensures container ref is fully rendered
-        setTimeout(() => {
-          const container = document.getElementById('modal-google-signin-btn');
-          if (container) {
-            window.google.accounts.id.renderButton(
-              container,
-              { 
-                theme: theme === 'dark' ? 'dark' : 'filled_blue', 
-                size: 'large', 
-                width: 320, 
-                text: 'signin_with',
-                shape: 'pill'
-              }
-            );
-          }
-        }, 100);
       } catch (err) {
         console.error('Google initialize error:', err);
       }
@@ -69,15 +55,37 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
       script.async = true;
       script.defer = true;
       script.onload = initGoogleSignIn;
-      script.onerror = () => {
-        console.error('Failed to load Google Sign-In SDK.');
-        setError('Unable to load Google Authentication client.');
-      };
+      script.onerror = () => setError('Unable to load Google Authentication client.');
       document.body.appendChild(script);
     } else {
       setTimeout(initGoogleSignIn, 150);
     }
   }, [isOpen, theme]);
+
+  // Separate effect to render the google button when the container is available
+  useEffect(() => {
+    if (isOpen && step === 'email' && !loading && window.google) {
+      const renderBtn = () => {
+        const container = document.getElementById('modal-google-signin-btn');
+        if (container && window.google.accounts.id.renderButton) {
+          container.innerHTML = ''; // clear before render
+          window.google.accounts.id.renderButton(
+            container,
+            { 
+              theme: theme === 'dark' ? 'dark' : 'filled_blue', 
+              size: 'large', 
+              width: 320, 
+              text: 'signin_with',
+              shape: 'pill'
+            }
+          );
+        }
+      };
+      // Short delay to ensure DOM is ready after state change
+      const t = setTimeout(renderBtn, 50);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen, step, loading, theme]);
 
   if (!isOpen) return null;
 
@@ -90,10 +98,8 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: response.credential })
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to authenticate with Google');
-
       onLoginSuccess(data.user, data.token);
     } catch (err) {
       setError(err.message || 'Google verification failed.');
@@ -102,7 +108,6 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
     }
   };
 
-  // 3. Passwordless OTP Actions
   const handleRequestOtp = async (e) => {
     e.preventDefault();
     if (!email) return;
@@ -128,7 +133,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
         setStep('otp');
       }
     } catch (err) {
-      setError(err.message || 'Verification email failed to send.');
+      setError(err.message || 'Verification email failed to send. Check server connection.');
     } finally {
       setLoading(false);
     }
@@ -146,10 +151,8 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp, name })
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Verification failed');
-
       onLoginSuccess(data.user, data.token);
     } catch (err) {
       setError(err.message || 'Verification failed. Please double check the OTP.');
@@ -168,10 +171,8 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to resend code');
-
       setResendTimer(60);
       setError('A new verification code has been dispatched to your inbox!');
     } catch (err) {
@@ -181,224 +182,125 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
     }
   };
 
-  // Onboarding Slides Data
-  const slides = [
-    {
-      title: 'Democratizing Clinical Veracity',
-      desc: 'Synthesizing global epidemiological data indices across multiple scientific networks (WHO, PubMed, ClinicalTrials, OpenFDA) to neutralize misinformation instantly.',
-      badge: '01 // SYSTEM PLATFORM'
-    },
-    {
-      title: 'Deep-Science Synthesis Engine',
-      desc: 'Harnesses real-time search synthesis algorithms to cross-reference multi-layered research data and output authoritative clinical verification indexes.',
-      badge: '02 // COGNITIVE ARCHITECTURE'
-    },
-    {
-      title: 'Zero-Data-Retention Security',
-      desc: 'Automatic Zero-Data-Retention filters scrub all personal health information (PHI) before AI synthesis passes, keeping patient logs completely HIPAA-safe.',
-      badge: '03 // HIPAA PRIVACY'
-    }
-  ];
-
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-on-background/40 backdrop-blur-sm p-4 animate-fade-in-up" onClick={onClose}>
       <div 
-        className={`${styles.modalCard} ${showSlides ? styles.modalCardWide : ''}`} 
+        className="glass-panel w-full max-w-md rounded-2xl shadow-float overflow-hidden flex flex-col relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top edge gradient highlight */}
-        <div className={styles.refractionEdge} />
-
-        {/* Left Side: Interactive Onboarding slides (Optional/Responsive toggle) */}
-        {showSlides && (
-          <div className={styles.carouselSection}>
-            <div className={styles.carouselContent}>
-              <span className={styles.slideBadge}>{slides[activeSlide].badge}</span>
-              <h2 className={styles.slideTitle}>{slides[activeSlide].title}</h2>
-              <p className={styles.slideDesc}>{slides[activeSlide].desc}</p>
-            </div>
-            
-            <div className={styles.carouselControls}>
-              <div className={styles.carouselDots}>
-                {slides.map((_, i) => (
-                  <button 
-                    key={i} 
-                    className={`${styles.carouselDot} ${activeSlide === i ? styles.carouselDotActive : ''}`} 
-                    onClick={() => setActiveSlide(i)}
-                  />
-                ))}
-              </div>
-              <button 
-                className={styles.skipBtn} 
-                onClick={() => setShowSlides(false)}
-              >
-                Hide Info Panel ✕
-              </button>
-            </div>
+        <button className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface text-xl" onClick={onClose} aria-label="Close modal">✕</button>
+        
+        <div className="p-8 pb-4">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
+            <h1 className="font-headline text-3xl text-on-surface font-bold">Sign In</h1>
           </div>
-        )}
+          <p className="font-body text-sm text-on-surface-variant mb-6">Passwordless Secure Clinical Fact-Checking</p>
 
-        {/* Right Side: Authentication Card */}
-        <div className={styles.authSection}>
-          {/* Header */}
-          <div className={styles.header}>
-            <button className={styles.closeBtn} onClick={onClose} aria-label="Close modal">✕</button>
-            <div className={styles.logoRow}>
-              <div className={styles.logoIcon}>
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="15" y="6" width="10" height="28" rx="3" fill="url(#grad1)"/>
-                  <rect x="6" y="15" width="28" height="10" rx="3" fill="url(#grad1)"/>
-                  <circle cx="28" cy="28" r="10" fill="var(--bg-surface)"/>
-                  <circle cx="28" cy="28" r="9" fill="url(#grad2)"/>
-                  <path d="M24 28.5l2.5 2.5 5-5" stroke="var(--bg-surface)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <defs>
-                    <linearGradient id="grad1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="var(--md-primary)"/>
-                      <stop offset="1" stopColor="var(--md-secondary)"/>
-                    </linearGradient>
-                    <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                      <stop stopColor="var(--md-primary)"/>
-                      <stop offset="1" stopColor="#5df5c0"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <h1 className={styles.brandTitle}>Med-Verify <span className={styles.proBadge}>PRO</span></h1>
-            </div>
-            <p className={styles.brandSubtitle}>Passwordless Secure Clinical Fact-Checking Platform</p>
-          </div>
-
-          {/* Error Message */}
           {error && (
-            <div className={`${styles.alert} ${error.includes('dispatched') ? styles.alertSuccess : ''}`}>
-              {error.includes('dispatched') ? '✉️' : '⚠️'} {error}
+            <div className={`mb-6 p-4 text-sm font-body rounded-lg flex items-start gap-2 ${error.includes('dispatched') ? 'bg-surface-container-high text-primary' : 'bg-error-container text-on-error-container'}`}>
+              <span className="material-symbols-outlined mt-0.5">{error.includes('dispatched') ? 'mark_email_read' : 'error'}</span>
+              {error}
             </div>
           )}
 
-          {/* Main Auth States */}
           {loading ? (
-            <div className={styles.loadingWrapper}>
-              <div className={styles.spinner} />
-              <span>Verifying secure clinical tunnel...</span>
+            <div className="flex flex-col items-center justify-center py-12 gap-4">
+              <span className="material-symbols-outlined text-primary text-4xl animate-spin">progress_activity</span>
+              <span className="font-body text-sm text-on-surface-variant">Verifying secure clinical tunnel...</span>
             </div>
           ) : (
             <>
-              {/* Step 1: Email Form */}
               {step === 'email' && (
-                <form onSubmit={handleRequestOtp} className={styles.form}>
-                  <div className={styles.inputGroup}>
-                    <label className={styles.label}>Email Address</label>
+                <form onSubmit={handleRequestOtp} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-body text-sm font-bold text-on-surface">Email Address</label>
                     <input 
                       type="email"
-                      placeholder="e.g. name123@gmail.com"
-                      className={styles.input}
+                      placeholder="e.g. aditya@medverify.org"
+                      className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 font-body focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
-                  <button type="submit" className="btn-primary">
+                  <button type="submit" className="bg-primary text-on-primary py-3 rounded-lg font-body font-medium hover:bg-on-primary-fixed-variant transition-colors w-full mt-2 shadow-soft">
                     Verify Email & Send OTP ➔
                   </button>
                 </form>
               )}
 
-              {/* Step 2: Name Entry for Registration */}
               {step === 'name' && (
-                <form onSubmit={(e) => { e.preventDefault(); setStep('otp'); }} className={styles.form}>
-                  <div className={styles.alertInfo}>
-                    ✨ Welcome! Your email is not registered yet. Please enter your name to set up a free Pro profile:
+                <form onSubmit={(e) => { e.preventDefault(); setStep('otp'); }} className="flex flex-col gap-4">
+                  <div className="bg-surface-container-low p-4 rounded-lg font-body text-sm text-on-surface mb-2">
+                    ✨ Welcome! Your email is not registered yet. Please enter your name to set up a free profile.
                   </div>
-                  <div className={styles.inputGroup}>
-                    <label className={styles.label}>Full Name</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-body text-sm font-bold text-on-surface">Full Name</label>
                     <input 
                       type="text"
-                      placeholder="Dr. Aditya Verma"
-                      className={styles.input}
+                      placeholder="Dr. Rajesh Kumar"
+                      className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 font-body focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
                     />
                   </div>
-                  <button type="submit" className="btn-primary">
+                  <button type="submit" className="bg-primary text-on-primary py-3 rounded-lg font-body font-medium hover:bg-on-primary-fixed-variant transition-colors w-full mt-2 shadow-soft">
                     Next: Enter Security Code ➔
                   </button>
                 </form>
               )}
 
-              {/* Step 3: OTP Code Entry */}
               {step === 'otp' && (
-                <form onSubmit={handleVerifyOtp} className={styles.form}>
-                  <div className={styles.alertInfo}>
-                    ✉️ Security OTP code sent to <strong>{email}</strong>. Please check your spam folder if not received.
+                <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
+                  <div className="bg-surface-container-low p-4 rounded-lg font-body text-sm text-on-surface mb-2 border border-outline-variant/30">
+                    ✉️ Security OTP code sent to <strong className="text-primary">{email}</strong>. Check your spam folder if not received.
                   </div>
-                  <div className={styles.inputGroup}>
-                    <label className={styles.label}>6-Digit Security Code</label>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-body text-sm font-bold text-on-surface">6-Digit Security Code</label>
                     <input 
                       type="text"
                       maxLength="6"
                       placeholder="••••••"
-                      className={`${styles.input} ${styles.inputOtp}`}
+                      className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 font-body tracking-[0.5em] text-center text-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                       required
                     />
                   </div>
-                  <button type="submit" className="btn-primary">
-                    Confirm Access Code & Sign In ➔
+                  <button type="submit" className="bg-primary text-on-primary py-3 rounded-lg font-body font-medium hover:bg-on-primary-fixed-variant transition-colors w-full mt-2 shadow-soft flex items-center justify-center gap-2">
+                    Confirm Access Code <span className="material-symbols-outlined text-sm">login</span>
                   </button>
 
-                  <div className={styles.resendRow}>
-                    <button 
-                      type="button" 
-                      className={styles.backBtn} 
-                      onClick={() => setStep(isNewUser ? 'name' : 'email')}
-                    >
-                      ← Back
+                  <div className="flex justify-between items-center mt-2 font-body text-sm">
+                    <button type="button" className="text-secondary hover:text-primary transition-colors flex items-center gap-1" onClick={() => setStep(isNewUser ? 'name' : 'email')}>
+                      <span className="material-symbols-outlined text-[16px]">arrow_back</span> Back
                     </button>
-                    <button 
-                      type="button" 
-                      className={styles.resendBtn} 
-                      onClick={handleResendOtp}
-                      disabled={resendTimer > 0}
-                    >
+                    <button type="button" className={`transition-colors font-semibold ${resendTimer > 0 ? 'text-secondary/50 cursor-not-allowed' : 'text-primary hover:underline'}`} onClick={handleResendOtp} disabled={resendTimer > 0}>
                       {resendTimer > 0 ? `Resend Code (${resendTimer}s)` : 'Resend Code'}
                     </button>
                   </div>
                 </form>
               )}
 
-              {/* Social Login Divider (Only in Step 1) */}
               {step === 'email' && (
                 <>
-                  <div className={styles.divider}>
-                    <span className={styles.dividerLine} />
-                    <span className={styles.dividerText}>or securely continue with</span>
-                    <span className={styles.dividerLine} />
+                  <div className="flex items-center my-6">
+                    <div className="flex-1 border-t border-outline-variant/60"></div>
+                    <div className="px-4 text-xs font-body text-secondary uppercase tracking-wider">or securely continue with</div>
+                    <div className="flex-1 border-t border-outline-variant/60"></div>
                   </div>
-
-                  {/* Google OAuth SDK mount target */}
-                  <div className={styles.googleContainer}>
-                    <div id="modal-google-signin-btn" className={styles.googleBtn} />
+                  <div className="flex justify-center w-full min-h-[44px]">
+                    <div id="modal-google-signin-btn" className="flex justify-center" />
                   </div>
                 </>
               )}
             </>
           )}
-
-          {/* Info toggle footer */}
-          {!showSlides && (
-            <button 
-              className={styles.toggleSlidesBtn} 
-              onClick={() => setShowSlides(true)}
-            >
-              📖 View System & Platform Specifications
-            </button>
-          )}
-
-          <div className={styles.footerNote}>
-            🔒 HIPAA secured. Zero data retention policies active.
-          </div>
+        </div>
+        <div className="bg-surface-container-low p-4 text-center font-body text-xs text-secondary border-t border-outline-variant/60 flex items-center justify-center gap-2">
+            <span className="material-symbols-outlined text-[14px]">lock</span> HIPAA secured. Zero data retention policies active.
         </div>
       </div>
     </div>
