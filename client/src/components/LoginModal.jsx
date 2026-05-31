@@ -9,6 +9,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resendTimer, setResendTimer] = useState(0);
+  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
 
   useEffect(() => {
     let timer;
@@ -43,6 +44,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
           callback: handleGoogleCredentialResponse,
           auto_select: false
         });
+        setIsGoogleLoaded(true);
       } catch (err) {
         console.error('Google initialize error:', err);
       }
@@ -64,7 +66,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
 
   // Separate effect to render the google button when the container is available
   useEffect(() => {
-    if (isOpen && step === 'email' && !loading && window.google) {
+    if (isOpen && step === 'email' && !loading && isGoogleLoaded && window.google) {
       const renderBtn = () => {
         const container = document.getElementById('modal-google-signin-btn');
         if (container && window.google.accounts.id.renderButton) {
@@ -85,7 +87,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
       const t = setTimeout(renderBtn, 50);
       return () => clearTimeout(t);
     }
-  }, [isOpen, step, loading, theme]);
+  }, [isOpen, step, loading, theme, isGoogleLoaded]);
 
   if (!isOpen) return null;
 
