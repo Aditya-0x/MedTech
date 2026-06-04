@@ -96,7 +96,7 @@ async function locatePharmacies(lat, lng, radius = 20000) {
   console.log(`🌐 Searching Ola Krutrim Maps API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
 
   try {
-    const url = 'https://api.olamaps.io/places/v1/nearbysearch';
+    const url = 'https://api.olamaps.io/places/v1/nearbysearch/advanced';
     const response = await axios.get(url, {
       params: {
         location: `${userLat},${userLng}`,
