@@ -419,7 +419,7 @@ export default function GenericFinder({ theme }) {
                             <span className="material-symbols-outlined text-[18px]">call</span> Call
                           </a>
                           <a 
-                            href={`https://www.google.com/maps/search/?api=1&query=${shop.latitude},${shop.longitude}`}
+                            href={shop.website || `https://www.google.com/maps/search/?api=1&query=${shop.latitude},${shop.longitude}`}
                             target="_blank" 
                             rel="noopener noreferrer" 
                             className="flex-1 flex justify-center items-center gap-1.5 bg-surface text-primary border border-primary/30 hover:bg-primary/5 py-2 rounded-lg font-body text-sm font-semibold transition-colors"
