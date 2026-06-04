@@ -37,7 +37,11 @@ async function locatePharmaciesOSM(userLat, userLng, radius) {
     });
 
     const elements = response.data?.elements || [];
-    osmPharmacies = elements.map(el => {
+    
+    // Filter out locations that don't have a name to avoid "fake" looking generic results
+    const namedElements = elements.filter(el => el.tags && el.tags.name);
+    
+    osmPharmacies = namedElements.map(el => {
       const tags = el.tags || {};
       const shopLat = el.lat || el.center?.lat;
       const shopLng = el.lon || el.center?.lon;
