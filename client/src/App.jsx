@@ -8,6 +8,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 import LoginModal from './components/LoginModal';
 import Dashboard from './components/Dashboard';
 import GenericFinder from './components/GenericFinder';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
 
 const API_BASE = '/api';
@@ -260,7 +261,9 @@ export default function App() {
             )
           } />
           
+          
           <Route path="/trumeds" element={<GenericFinder theme={theme} />} />
+          <Route path="/contact" element={<Contact user={user} />} />
           
           <Route path="/" element={
             <>

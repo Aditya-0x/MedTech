@@ -61,12 +61,13 @@ export default function Header({ user, onLogout, showHero, theme, onToggleTheme,
               Archive 🔒
             </button>
           )}
-          <a
-            href="/contact.html"
-            className="font-body text-label-md transition-colors duration-300 text-on-surface-variant hover:text-primary"
+          <Link
+            to="/contact"
+            className={`font-body text-label-md transition-colors duration-300 ${path === '/contact' || path === '/contact.html' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
+            onClick={handleNavClick}
           >
             Contact
-          </a>
+          </Link>
         </nav>
       </div>
 
@@ -153,12 +154,13 @@ export default function Header({ user, onLogout, showHero, theme, onToggleTheme,
               Archive 🔒
             </button>
           )}
-          <a
-            href="/contact.html"
-            className="text-left font-body text-lg text-on-surface-variant hover:text-primary"
+          <Link
+            to="/contact"
+            className={`text-left font-body text-lg ${path === '/contact' || path === '/contact.html' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}
+            onClick={handleNavClick}
           >
             Contact
-          </a>
+          </Link>
           <hr className="border-outline-variant/30 my-2" />
           {user ? (
             <div className="flex justify-between items-center">
