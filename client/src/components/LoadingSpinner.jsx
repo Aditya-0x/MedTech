@@ -9,7 +9,7 @@ const STEPS = [
 
 export default function LoadingSpinner({ hasImage = false }) {
   return (
-    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-8 bg-surface-container-low/50 rounded-2xl border border-outline-variant/50 animate-fade-in-up" role="status" aria-label="Verifying claim...">
+    <div className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto p-8 bg-surface-container-lowest/50 rounded-lg border border-outline/10 animate-fade-in-up" role="status" aria-label="Verifying claim...">
       
       {/* Orb */}
       <div className="relative w-32 h-32 flex items-center justify-center mb-8">
@@ -27,7 +27,7 @@ export default function LoadingSpinner({ hasImage = false }) {
 
       <div className="w-full flex flex-col gap-4">
         {STEPS.filter(s => hasImage || s.id !== 1).map((step, i) => (
-          <div key={step.id} className="flex items-center gap-4 bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/60 relative overflow-hidden group">
+          <div key={step.id} className="flex items-center gap-4 bg-surface-container-lowest p-4 rounded-lg border border-outline/10 relative overflow-hidden group">
             
             <div className="absolute bottom-0 left-0 h-1 bg-primary/20 w-full">
                 <div className="h-full bg-primary animate-pulse w-1/2"></div>

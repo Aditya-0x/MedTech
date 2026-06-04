@@ -16,116 +16,13 @@ function getHaversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Parses OSM `opening_hours` format (e.g., "Mo-Su 09:00-21:00", "24/7", "Mo-Sa 09:00-18:00")
- * returns { isOpen: boolean, statusText: string }
+ * Fallback OSM Method if Mappls fails
  */
-function parseOpeningHours(openingHoursStr, userLocalTime = new Date()) {
-  if (!openingHoursStr) {
-    // If opening hours are missing, we default to standard pharmacy hours (09:00 - 21:00)
-    return evaluateStandardHours("Mo-Su 09:00-21:00", userLocalTime);
-  }
-
-  const cleanHours = openingHoursStr.trim().toLowerCase();
-
-  if (cleanHours === '24/7' || cleanHours.includes('24 hours') || cleanHours === 'mo-su 00:00-24:00') {
-    return { isOpen: true, statusText: 'Open 24/7' };
-  }
-
-  try {
-    return evaluateStandardHours(openingHoursStr, userLocalTime);
-  } catch (e) {
-    // Fallback in case parsing errors out
-    return { isOpen: true, statusText: 'Open • Call to confirm hours' };
-  }
-}
-
-/**
- * Helper to parse and evaluate standard daily hour structures
- */
-function evaluateStandardHours(hoursStr, now) {
-  const currentDayIndex = now.getDay(); // 0 is Sunday, 1 is Monday...
-  const daysShort = ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'];
-  const currentDay = daysShort[currentDayIndex];
-  
-  const currentHour = now.getHours();
-  const currentMin = now.getMinutes();
-  const currentTimeVal = currentHour * 60 + currentMin; // minutes since midnight
-
-  // Split schedules by semicolon (e.g. "Mo-Sa 09:00-18:00; Su 10:00-16:00")
-  const parts = hoursStr.split(';');
-
-  for (const part of parts) {
-    const trimmed = part.trim().toLowerCase();
-    if (!trimmed) continue;
-
-    // Check if this part applies to the current day
-    let dayMatch = false;
-
-    if (trimmed.includes('mo-su') || trimmed.includes('daily') || trimmed.includes('mo-sa') || trimmed.includes('we-su')) {
-      // General ranges
-      if (trimmed.includes('mo-su') || trimmed.includes('daily')) {
-        dayMatch = true;
-      } else if (trimmed.includes('mo-sa') && currentDay !== 'su') {
-        dayMatch = true;
-      } else if (trimmed.includes('we-su') && (currentDayIndex >= 3 || currentDayIndex === 0)) {
-        dayMatch = true;
-      }
-    } else {
-      // Check for specific days (e.g., "mo,we,fr" or single days like "su")
-      const dayTokens = trimmed.split(/\s+/)[0]; // get day section (e.g., "mo,we,fr")
-      if (dayTokens.includes(currentDay)) {
-        dayMatch = true;
-      }
-    }
-
-    if (dayMatch) {
-      // Extract time range (e.g. "09:00-18:00")
-      const timeMatch = trimmed.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-      if (timeMatch) {
-        const startHour = parseInt(timeMatch[1], 10);
-        const startMin = parseInt(timeMatch[2], 10);
-        const endHour = parseInt(timeMatch[3], 10);
-        const endMin = parseInt(timeMatch[4], 10);
-
-        const startTimeVal = startHour * 60 + startMin;
-        const endTimeVal = endHour * 60 + endMin;
-
-        if (currentTimeVal >= startTimeVal && currentTimeVal <= endTimeVal) {
-          const formattedEnd = `${endHour > 12 ? endHour - 12 : endHour}:${endMin < 10 ? '0' + endMin : endMin} ${endHour >= 12 ? 'PM' : 'AM'}`;
-          return { isOpen: true, statusText: `Open Now • Closes at ${formattedEnd}` };
-        } else {
-          const formattedStart = `${startHour > 12 ? startHour - 12 : startHour}:${startMin < 10 ? '0' + startMin : startMin} ${startHour >= 12 ? 'PM' : 'AM'}`;
-          return { isOpen: false, statusText: `Closed • Opens at ${formattedStart}` };
-        }
-      }
-    }
-  }
-
-  // If no day matches, default fallback
-  return { isOpen: true, statusText: 'Open Now • Closes at 9:00 PM' };
-}
-
-/**
- * Queries OpenStreetMap Overpass API for pharmacies near a latitude and longitude,
- * calculates Haversine distance, and sorts in ascending order.
- * 
- * @param {number} lat - Latitude
- * @param {number} lng - Longitude
- * @param {number} [radius=8000] - Radius in meters
- * @returns {Promise<Array>} List of sorted pharmacies
- */
-async function locatePharmacies(lat, lng, radius = 10000) {
-  // If coordinates are invalid, default to a sensible fallback (e.g. Kanakapura, Bangalore coordinates)
-  const userLat = parseFloat(lat) || 12.9716;
-  const userLng = parseFloat(lng) || 77.5946;
-
-  console.log(`🌐 Searching pharmacies around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
-
+async function locatePharmaciesOSM(userLat, userLng, radius) {
   let osmPharmacies = [];
-
   try {
     const overpassQuery = `
-      [out:json][timeout:15];
+      [out:json][timeout:25];
       (
         node["amenity"="pharmacy"](around:${radius}, ${userLat}, ${userLng});
         way["amenity"="pharmacy"](around:${radius}, ${userLat}, ${userLng});
@@ -135,64 +32,127 @@ async function locatePharmacies(lat, lng, radius = 10000) {
 
     const url = 'https://overpass-api.de/api/interpreter';
     const response = await axios.post(url, overpassQuery, {
-      headers: { 
-        'Content-Type': 'text/plain',
-        'User-Agent': 'MedVerify/1.0.0 (https://medverify-pro.vercel.app; contact@medverify-pro.org)'
-      },
-      timeout: 12000
+      headers: { 'Content-Type': 'text/plain', 'User-Agent': 'MedVerifyApp/1.0' },
+      timeout: 20000
     });
 
     const elements = response.data?.elements || [];
-
     osmPharmacies = elements.map(el => {
       const tags = el.tags || {};
       const shopLat = el.lat || el.center?.lat;
       const shopLng = el.lon || el.center?.lon;
-
-      // Calculate exact distance
       const distanceKm = getHaversineDistance(userLat, userLng, shopLat, shopLng);
 
-      // Parse opening hours status
-      const hoursStatus = parseOpeningHours(tags.opening_hours);
-
-      // Synthesize address
       const addressParts = [
-        tags['addr:housenumber'],
-        tags['addr:street'],
-        tags['addr:suburb'],
-        tags['addr:city'],
-        tags['addr:postcode']
+        tags['addr:housenumber'], tags['addr:street'], tags['addr:suburb'],
+        tags['addr:city'], tags['addr:postcode']
       ].filter(Boolean);
       
-      const fullAddress = addressParts.length > 0
-        ? addressParts.join(', ')
-        : 'Registered pharmacy location';
+      const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : 'Registered pharmacy location';
+      const name = tags.name || 'Local Pharmacy';
+      const isGeneric = name.toLowerCase().includes('generic') || name.toLowerCase().includes('jan aushadhi') || name.toLowerCase().includes('discount');
 
       return {
         id: `osm-${el.id}`,
-        name: tags.name || 'Local Pharmacy',
+        name: name,
         address: fullAddress,
         phone: tags.phone || tags['contact:phone'] || 'Call not listed',
-        website: tags.website || 'Website not listed',
+        website: `https://www.google.com/maps/search/?api=1&query=${shopLat},${shopLng}`,
         latitude: shopLat,
         longitude: shopLng,
         distanceKm: parseFloat(distanceKm.toFixed(2)),
-        isOpen: hoursStatus.isOpen,
-        statusText: hoursStatus.statusText,
-        isPartner: false
+        isOpen: true,
+        statusText: tags.opening_hours ? `Hours: ${tags.opening_hours}` : 'Hours unknown',
+        isPartner: isGeneric 
       };
     });
 
   } catch (err) {
-    console.error('⚠️ OpenStreetMap Overpass query failed:', err.message);
-    // Continue so that simulated generic shops can still load even if Overpass API is down / timed out!
+    console.error('⚠️ OSM Fallback failed:', err.message);
   }
 
-  // Sort them strictly by ascending distance
-  osmPharmacies.sort((a, b) => a.distanceKm - b.distanceKm);
+  osmPharmacies.sort((a, b) => {
+    if (a.isPartner && !b.isPartner) return -1;
+    if (!a.isPartner && b.isPartner) return 1;
+    return a.distanceKm - b.distanceKm;
+  });
 
-  // Return the top 15 closest shops
   return osmPharmacies.slice(0, 15);
+}
+
+/**
+ * Primary location API: Attempts Mappls, falls back to OSM
+ */
+async function locatePharmacies(lat, lng, radius = 20000) {
+  const userLat = parseFloat(lat) || 12.9716;
+  const userLng = parseFloat(lng) || 77.5946;
+  
+  const mapplsKey = process.env.MAPPLS_API_KEY || 'umaeazoxvdlobrrgrgtxsgmlvtpvfhjtadfz';
+
+  console.log(`🌐 Searching Mappls API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
+
+  try {
+    const url = `https://apis.mappls.com/advancedmaps/v1/${mapplsKey}/nearby_search/json`;
+    const response = await axios.get(url, {
+      params: {
+        keywords: 'jan aushadhi;generic pharmacy;discount pharmacy;pharmacy',
+        refLocation: `${userLat},${userLng}`,
+        radius: radius
+      },
+      headers: {
+        'Referer': 'https://med-tech-zeta.vercel.app',
+        'Origin': 'https://med-tech-zeta.vercel.app'
+      },
+      timeout: 10000
+    });
+
+    const results = response.data?.suggestedLocations || [];
+    
+    if (results.length > 0) {
+      console.log(`✅ Mappls returned ${results.length} locations`);
+      let mapplsPharmacies = results.map(place => {
+        const shopLat = place.latitude;
+        const shopLng = place.longitude;
+        const distanceKm = place.distance ? place.distance / 1000 : getHaversineDistance(userLat, userLng, shopLat, shopLng);
+        
+        const name = place.placeName || 'Local Pharmacy';
+        const isGeneric = name.toLowerCase().includes('generic') || name.toLowerCase().includes('jan aushadhi') || name.toLowerCase().includes('davaindia');
+
+        return {
+          id: `mappls-${place.eLoc}`,
+          name: name,
+          address: place.placeAddress || 'Address not listed',
+          phone: place.orderIndex || 'Call not listed', 
+          website: `https://www.google.com/maps/search/?api=1&query=${shopLat},${shopLng}`,
+          latitude: shopLat,
+          longitude: shopLng,
+          distanceKm: parseFloat(distanceKm.toFixed(2)),
+          isOpen: true,
+          statusText: 'Mappls Verified Location',
+          isPartner: isGeneric
+        };
+      });
+
+      mapplsPharmacies.sort((a, b) => {
+        if (a.isPartner && !b.isPartner) return -1;
+        if (!a.isPartner && b.isPartner) return 1;
+        return a.distanceKm - b.distanceKm;
+      });
+
+      return mapplsPharmacies.slice(0, 15);
+    } else {
+      console.log('⚠️ Mappls returned 0 results. Falling back to OSM...');
+    }
+
+  } catch (err) {
+    const status = err.response?.status;
+    const msg = err.response?.data?.error?.message || err.message;
+    console.error(`⚠️ Mappls API failed (Status: ${status}):`, msg);
+    console.log('🔄 Initiating OpenStreetMap Fallback...');
+  }
+
+  // If Mappls fails (e.g. 412 error) or returns 0 results, fall back to OpenStreetMap
+  return await locatePharmaciesOSM(userLat, userLng, radius);
 }
 
 module.exports = { locatePharmacies };

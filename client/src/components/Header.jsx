@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-export default function Header({ user, activeView, onViewChange, onLogout, showHero, theme, onToggleTheme, onSignInClick }) {
+export default function Header({ user, onLogout, showHero, theme, onToggleTheme, onSignInClick }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const path = location.pathname;
 
-  const handleNavClick = (view) => {
-    onViewChange(view);
+  const handleNavClick = () => {
     setIsMenuOpen(false);
   };
 
@@ -19,45 +21,52 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 flex justify-between items-center px-10 h-20 glass-panel shadow-sm transition-all duration-300 ease-in-out">
+    <header className="fixed top-0 w-full z-50 flex justify-between items-center px-10 h-20 bg-surface-container-lowest border-b border-outline/10 transition-all duration-300 ease-in-out">
       <div className="flex items-center gap-16">
-          <a 
+          <Link 
+            to="/"
             className="font-headline text-3xl font-bold text-gradient-primary drop-shadow-sm tracking-tight cursor-pointer mr-4 hover:scale-105 transition-transform duration-300" 
-          onClick={() => handleNavClick('verify')}
-        >
+            onClick={handleNavClick}
+          >
           MedVerify
-        </a>
+        </Link>
         <nav className="hidden md:flex items-center gap-10">
-          <button
-            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'verify' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
-            onClick={() => handleNavClick('verify')}
+          <Link
+            to="/"
+            className={`font-body text-label-md transition-colors duration-300 ${path === '/' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
+            onClick={handleNavClick}
           >
             Claims
-          </button>
-          <button
-            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'generic' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
-            onClick={() => handleNavClick('generic')}
+          </Link>
+          <Link
+            to="/trumeds"
+            className={`font-body text-label-md transition-colors duration-300 ${path === '/trumeds' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
+            onClick={handleNavClick}
           >
             TruMeds
-          </button>
-          <button
-            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'history' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
-            onClick={() => user ? handleNavClick('history') : onSignInClick()}
-          >
-            Archive {!user && '🔒'}
-          </button>
-          <button
-            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'about' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
-            onClick={() => handleNavClick('about')}
-          >
-            Methodology
-          </button>
-          <button
-            className={`font-body text-label-md transition-colors duration-300 ${activeView === 'contact' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
-            onClick={() => handleNavClick('contact')}
+          </Link>
+          {user ? (
+            <Link
+              to="/history"
+              className={`font-body text-label-md transition-colors duration-300 ${path === '/history' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
+              onClick={handleNavClick}
+            >
+              Archive
+            </Link>
+          ) : (
+            <button
+              className={`font-body text-label-md transition-colors duration-300 ${path === '/history' ? 'text-primary border-b-2 border-primary pb-1 font-medium' : 'text-on-surface-variant hover:text-primary'}`}
+              onClick={onSignInClick}
+            >
+              Archive 🔒
+            </button>
+          )}
+          <a
+            href="/contact.html"
+            className="font-body text-label-md transition-colors duration-300 text-on-surface-variant hover:text-primary"
           >
             Contact
-          </button>
+          </a>
         </nav>
       </div>
 
@@ -96,7 +105,7 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
           </div>
         ) : (
           <button 
-            className="hidden md:flex items-center justify-center bg-primary text-on-primary px-6 py-2.5 rounded-lg font-body text-sm font-semibold hover:bg-primary/90 transition-colors duration-300 shadow-[0_2px_16px_rgba(58,48,42,0.08)]"
+            className="hidden md:flex items-center justify-center bg-primary-container text-white px-6 py-2.5 rounded-full font-body text-sm font-semibold hover:bg-primary-container/90 transition-colors duration-300"
             onClick={handleSignIn}
           >
             Verify Now / Sign In
@@ -114,36 +123,42 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="absolute top-20 left-0 w-full bg-background border-b border-outline-variant/60 shadow-lg p-6 flex flex-col gap-4 md:hidden z-40">
-           <button
-            className={`text-left font-body text-lg ${activeView === 'verify' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-            onClick={() => handleNavClick('verify')}
+           <Link
+            to="/"
+            className={`text-left font-body text-lg ${path === '/' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
+            onClick={handleNavClick}
           >
             Claims
-          </button>
-          <button
-            className={`text-left font-body text-lg ${activeView === 'generic' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-            onClick={() => handleNavClick('generic')}
+          </Link>
+          <Link
+            to="/trumeds"
+            className={`text-left font-body text-lg ${path === '/trumeds' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
+            onClick={handleNavClick}
           >
             TruMeds
-          </button>
-          <button
-            className={`text-left font-body text-lg ${activeView === 'history' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-            onClick={() => user ? handleNavClick('history') : onSignInClick()}
-          >
-            Archive {!user && '🔒'}
-          </button>
-          <button
-            className={`text-left font-body text-lg ${activeView === 'about' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-            onClick={() => handleNavClick('about')}
-          >
-            Methodology
-          </button>
-          <button
-            className={`text-left font-body text-lg ${activeView === 'contact' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-            onClick={() => handleNavClick('contact')}
+          </Link>
+          {user ? (
+            <Link
+              to="/history"
+              className={`text-left font-body text-lg ${path === '/history' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
+              onClick={handleNavClick}
+            >
+              Archive
+            </Link>
+          ) : (
+            <button
+              className={`text-left font-body text-lg ${path === '/history' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
+              onClick={onSignInClick}
+            >
+              Archive 🔒
+            </button>
+          )}
+          <a
+            href="/contact.html"
+            className="text-left font-body text-lg text-on-surface-variant hover:text-primary"
           >
             Contact
-          </button>
+          </a>
           <hr className="border-outline-variant/30 my-2" />
           {user ? (
             <div className="flex justify-between items-center">
@@ -155,7 +170,7 @@ export default function Header({ user, activeView, onViewChange, onLogout, showH
             </div>
           ) : (
             <button 
-              className="w-full bg-primary text-on-primary py-3 rounded-lg font-body font-semibold"
+              className="w-full bg-primary-container text-white py-3 rounded-full font-body font-semibold"
               onClick={handleSignIn}
             >
               Verify Now / Sign In

@@ -159,13 +159,13 @@ export default function GenericFinder({ theme }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           
           {/* Uploader Column */}
-          <div className="bg-surface-container-low hand-drawn-border p-8 shadow-soft relative overflow-hidden hover:-translate-y-2 hover:shadow-float transition-all duration-300">
+          <div className="bg-surface-container-lowest border border-outline/10 rounded-lg p-8 relative overflow-hidden hover:border-primary/40 transition-all duration-300">
             <h2 className="font-headline text-2xl text-on-surface mb-6 flex items-center gap-3">
               <span className="material-symbols-outlined text-primary text-3xl">photo_camera</span>
               Option A: Upload Prescription
             </h2>
             <form 
-              className={`w-full h-72 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${dragActive ? 'border-primary bg-primary/5' : 'border-outline-variant/80 hover:border-primary/50 hover:bg-surface-container-highest'}`}
+              className={`w-full h-72 border-2 border-dashed rounded-lg flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${dragActive ? 'border-primary bg-primary/5' : 'border-outline/30 hover:border-primary/50 hover:bg-surface-container-highest'}`}
               onDragEnter={handleDrag} onDragOver={handleDrag} onDragLeave={handleDrag} onDrop={handleDrop}
               onClick={() => fileInputRef.current.click()}
             >
@@ -190,7 +190,7 @@ export default function GenericFinder({ theme }) {
           </div>
 
           {/* Search Column */}
-          <div className="bg-surface-container-lowest hand-drawn-border p-8 shadow-soft flex flex-col hover:-translate-y-2 hover:shadow-float transition-all duration-300">
+          <div className="bg-surface-container-lowest border border-outline/10 rounded-lg p-8 flex flex-col hover:border-primary/40 transition-all duration-300">
             <h2 className="font-headline text-2xl text-on-surface mb-6 flex items-center gap-3">
               <span className="material-symbols-outlined text-tertiary text-3xl">keyboard</span>
               Option B: Search Manually
@@ -203,7 +203,7 @@ export default function GenericFinder({ theme }) {
                   <input 
                     type="text" 
                     placeholder="e.g., Lipitor, Tylenol, Humira..." 
-                    className="w-full bg-surface-container-low border border-outline-variant rounded-xl pl-12 pr-4 py-3.5 font-body text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition disabled:opacity-50"
+                    className="w-full bg-surface-container-lowest border border-outline/20 rounded-lg pl-12 pr-4 py-3.5 font-body text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition disabled:opacity-50"
                     value={brandSearch}
                     onChange={(e) => setBrandSearch(e.target.value)}
                     disabled={!!imageFile}
@@ -243,7 +243,7 @@ export default function GenericFinder({ theme }) {
 
                 <button 
                   type="button" 
-                  className={`w-full bg-primary text-on-primary py-4 rounded-xl font-body font-bold text-lg hover:bg-on-primary-fixed-variant transition-colors shadow-soft flex items-center justify-center gap-2 ${isLoading ? 'opacity-50' : ''}`}
+                  className={`w-full bg-primary-container text-white py-4 rounded-full font-body font-bold text-lg hover:bg-primary-container/90 transition-colors flex items-center justify-center gap-2 ${isLoading ? 'opacity-50' : ''}`}
                   onClick={handleSearchSubmit}
                   disabled={isLoading}
                 >
@@ -278,7 +278,7 @@ export default function GenericFinder({ theme }) {
             
             {/* Left Result Column: Chemical Synthesis Report */}
             <div className="xl:col-span-3 flex flex-col gap-6">
-              <div className="bg-surface-container-lowest hand-drawn-border p-8 lg:p-10 shadow-soft hover:-translate-y-2 hover:shadow-float transition-all duration-300">
+              <div className="bg-surface-container-lowest border border-outline/10 rounded-lg p-8 lg:p-10 hover:border-primary/40 transition-all duration-300">
                 <div className="flex justify-between items-start mb-8">
                   <div>
                     <h3 className="font-headline text-3xl text-on-surface mb-2">{result.report.brandName} Equivalent</h3>
@@ -289,7 +289,7 @@ export default function GenericFinder({ theme }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-surface-container-low p-6 rounded-2xl mb-8 border border-outline-variant/40">
+                <div className="flex items-center gap-4 bg-surface-container-lowest border border-outline/10 p-6 rounded-lg mb-8">
                   <div className="flex-1 bg-surface py-3 px-4 rounded-xl text-center border border-outline-variant/40 shadow-sm font-headline text-xl text-on-surface truncate">{result.report.brandName}</div>
                   <span className="material-symbols-outlined text-primary text-3xl">arrow_forward</span>
                   <div className="flex-1 bg-primary text-on-primary py-3 px-4 rounded-xl text-center shadow-md font-headline text-xl truncate">{result.report.genericName}</div>
@@ -359,7 +359,7 @@ export default function GenericFinder({ theme }) {
                   </ul>
                 </div>
 
-                <button type="button" className="w-full bg-surface-container hover:bg-surface-variant text-on-surface py-3 rounded-xl font-body font-bold transition-colors border border-outline-variant/40" onClick={handleReset}>
+                <button type="button" className="w-full bg-surface-container hover:bg-surface-variant text-on-surface py-3 rounded-full font-body font-bold transition-colors border border-outline/20" onClick={handleReset}>
                   🔍 Look Up Another Prescription
                 </button>
               </div>
@@ -367,7 +367,7 @@ export default function GenericFinder({ theme }) {
 
             {/* Right Result Column: Pharmacy Locator list */}
             <div className="xl:col-span-2">
-              <div className="bg-surface-container-lowest hand-drawn-border p-6 lg:p-8 shadow-soft h-full flex flex-col hover:-translate-y-2 hover:shadow-float transition-all duration-300">
+              <div className="bg-surface-container-lowest border border-outline/10 rounded-lg p-6 lg:p-8 h-full flex flex-col hover:border-primary/40 transition-all duration-300">
                 <div className="mb-6">
                   <h3 className="font-headline text-2xl text-on-surface mb-1 flex items-center gap-2">
                     <span className="material-symbols-outlined text-primary">storefront</span> Nearby Pharmacies
@@ -378,7 +378,7 @@ export default function GenericFinder({ theme }) {
                 <div className="flex-grow flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
                   {result.pharmacies && result.pharmacies.length > 0 ? (
                     result.pharmacies.map((shop) => (
-                      <div key={shop.id} className={`p-5 rounded-2xl border transition-all ${shop.isPartner ? 'bg-primary/5 border-primary/30 shadow-[0_4px_12px_rgba(194,101,42,0.08)]' : 'bg-surface border-outline-variant/40 hover:border-outline-variant'}`}>
+                      <div key={shop.id} className={`p-5 rounded-lg border transition-all ${shop.isPartner ? 'bg-primary/5 border-primary/30 shadow-none' : 'bg-surface border-outline/20 hover:border-outline/40'}`}>
                         {shop.isPartner && (
                           <div className="inline-block bg-primary text-on-primary font-body text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded mb-3">
                             ✨ Med-Verify Savings Partner

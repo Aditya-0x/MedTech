@@ -91,7 +91,7 @@ export default function Dashboard({ userToken, onSelectReport, onNavigateToVerif
       )}
 
       {history.length === 0 ? (
-        <div className="bg-surface-container-low border border-outline-variant/60 rounded-3xl p-12 text-center flex flex-col items-center">
+        <div className="bg-surface-container-lowest border border-outline/10 rounded-lg p-12 text-center flex flex-col items-center">
           <div className="w-20 h-20 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center text-4xl mb-6">
             <span className="material-symbols-outlined text-5xl">science</span>
           </div>
@@ -101,7 +101,7 @@ export default function Dashboard({ userToken, onSelectReport, onNavigateToVerif
           </p>
           <button 
             type="button" 
-            className="bg-primary text-on-primary px-8 py-3 rounded-xl font-body font-bold hover:bg-on-primary-fixed-variant transition-colors shadow-soft"
+            className="bg-primary-container text-white px-8 py-3 rounded-full font-body font-bold hover:bg-primary-container/90 transition-colors"
             onClick={onNavigateToVerify}
           >
             Verify a Claim Now →
@@ -118,7 +118,7 @@ export default function Dashboard({ userToken, onSelectReport, onNavigateToVerif
             return (
               <div 
                 key={item.id} 
-                className="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-6 hover:border-primary/40 hover:shadow-float transition-all duration-300 cursor-pointer flex flex-col justify-between group relative overflow-hidden"
+                className="bg-surface-container-lowest border border-outline/10 rounded-lg p-6 hover:border-primary/40 transition-all duration-300 cursor-pointer flex flex-col justify-between group relative overflow-hidden"
                 onClick={() => onSelectReport(item)}
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full pointer-events-none transition-opacity opacity-0 group-hover:opacity-100"></div>

@@ -55,7 +55,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
       {/* Verification Header / Hero */}
       <section className="w-full max-w-5xl flex flex-col items-center text-center mb-20">
         
-        <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-primary-fixed border border-primary/20 animate-soft-pulse mb-10 shadow-[0_4px_24px_rgba(194,101,42,0.15)]">
+        <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-primary-fixed border border-outline/10 mb-10">
             <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
               {verdict === 'TRUE' ? 'verified' : verdict === 'FALSE' ? 'cancel' : 'warning'}
             </span>
@@ -76,14 +76,14 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
 
         <div className="flex gap-4">
             <button
-                className="bg-primary text-on-primary px-6 py-2 rounded-lg font-body text-sm font-semibold hover:bg-primary/90 transition-colors shadow-soft"
+                className="bg-primary-container text-white px-6 py-2 rounded-full font-body text-sm font-semibold hover:bg-primary-container/90 transition-colors"
                 onClick={onReset}
             >
                 Verify Another Claim
             </button>
             {isAuthenticated ? (
                 <button
-                    className={`px-6 py-2 rounded-lg font-body text-sm font-semibold transition-colors border ${isSaved ? 'bg-surface-container-highest text-on-surface-variant border-outline-variant' : 'bg-surface text-primary border-primary hover:bg-primary/5'}`}
+                    className={`px-6 py-2 rounded-full font-body text-sm font-semibold transition-colors border ${isSaved ? 'bg-surface-container-highest text-on-surface-variant border-outline-variant' : 'bg-surface text-primary border-primary hover:bg-primary/5'}`}
                     onClick={onSave}
                     disabled={isSaved}
                 >
@@ -91,7 +91,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
                 </button>
             ) : (
                 <button
-                    className="px-6 py-2 rounded-lg font-body text-sm font-semibold transition-colors border bg-surface text-primary border-primary hover:bg-primary/5"
+                    className="px-6 py-2 rounded-full font-body text-sm font-semibold transition-colors border bg-surface text-primary border-primary hover:bg-primary/5"
                     onClick={onSignInRequired}
                 >
                     📥 Save to History (Sign In)
@@ -119,7 +119,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
                 {/* Card 1: Detailed Explanation */}
-                <article className="col-span-1 lg:col-span-2 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-8 lg:p-12 hover:border-primary/30 transition-colors duration-500 shadow-[0_2px_16px_rgba(58,48,42,0.02)]">
+                <article className="col-span-1 lg:col-span-2 bg-surface-container-lowest border border-outline/10 rounded-lg p-8 lg:p-12 hover:border-primary/30 transition-colors duration-500">
                     <div className="flex justify-between items-start mb-8">
                         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container">
                             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>biotech</span>
@@ -139,7 +139,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
                 </article>
 
                 {/* Card 2: Key Facts / Nuance */}
-                <article className="col-span-1 bg-surface-container-low border border-outline-variant/60 rounded-2xl p-8 hover:border-primary/30 transition-colors duration-500 flex flex-col justify-between">
+                <article className="col-span-1 bg-surface-container-lowest border border-outline/10 rounded-lg p-8 hover:border-primary/30 transition-colors duration-500 flex flex-col justify-between">
                     <div>
                         <div className="mb-6">
                             <span className="material-symbols-outlined text-tertiary text-3xl" style={{ fontVariationSettings: "'FILL' 0" }}>balance</span>
@@ -157,7 +157,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
 
                 {/* Card 3: Warnings (If any) */}
                 {result.verdict?.warnings && result.verdict?.warnings.length > 0 && (
-                    <article className="col-span-1 bg-error-container/30 border border-error/20 rounded-2xl p-8 hover:border-error/50 transition-colors duration-500">
+                    <article className="col-span-1 bg-error-container/30 border border-error/20 rounded-lg p-8 hover:border-error/50 transition-colors duration-500">
                         <div className="mb-6">
                             <span className="material-symbols-outlined text-error text-3xl" style={{ fontVariationSettings: "'FILL' 0" }}>warning</span>
                         </div>
@@ -171,7 +171,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
                 )}
 
                 {/* Card 4: Source Quality Matrix */}
-                <article className={`bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-8 hover:border-primary/30 transition-colors duration-500 relative overflow-hidden group ${result.verdict?.warnings?.length > 0 ? 'col-span-1 md:col-span-2 lg:col-span-2' : 'col-span-1 md:col-span-2'}`}>
+                <article className={`bg-surface-container-lowest border border-outline/10 rounded-lg p-8 hover:border-primary/30 transition-colors duration-500 relative overflow-hidden group ${result.verdict?.warnings?.length > 0 ? 'col-span-1 md:col-span-2 lg:col-span-2' : 'col-span-1 md:col-span-2'}`}>
                     <div className="absolute inset-0 bg-gradient-to-br from-surface-container-low to-transparent opacity-50 pointer-events-none"></div>
                     <h3 className="font-headline text-xl text-on-surface mb-6 relative z-10">Source Matrix</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
@@ -204,7 +204,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
             <h2 className="font-headline text-2xl text-on-surface mb-8 border-b border-outline-variant/60 pb-2">Academic Literature</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {pubmedList.slice(0,4).map((paper, idx) => (
-                    <div key={idx} className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-6 hover:border-primary/30 transition-colors">
+                    <div key={idx} className="bg-surface-container-lowest border border-outline/10 rounded-lg p-6 hover:border-primary/30 transition-colors">
                         <div className="font-body text-xs text-secondary mb-2">📅 {paper.year} · {paper.journal}</div>
                         <h4 className="font-headline text-lg text-on-surface mb-2 leading-snug">{paper.title}</h4>
                         <div className="font-body text-sm text-on-surface-variant mb-4 line-clamp-2">By {paper.authors}</div>
@@ -217,7 +217,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
 
       {/* Extracted Text (Optional) */}
       {result.ocrExtracted && (
-          <div className="w-full max-w-3xl mx-auto mb-24 bg-surface-container-low rounded-xl p-6 border border-outline-variant/40">
+          <div className="w-full max-w-3xl mx-auto mb-24 bg-surface-container-lowest rounded-lg p-6 border border-outline/10">
               <h4 className="font-headline text-lg text-on-surface mb-2">OCR Extracted Text</h4>
               <p className="font-body text-sm text-on-surface-variant whitespace-pre-wrap">{result.ocrExtracted}</p>
           </div>

@@ -19,18 +19,18 @@ export default function ClaimInput({ onVerify, isLoading }) {
     <div className="flex flex-col sm:flex-row w-full h-full relative">
       <textarea
         id="claim-input"
-        className="w-full bg-transparent border-none focus:ring-0 resize-none py-4 px-6 text-lg font-body placeholder-on-surface-variant/50 text-on-surface h-32 sm:h-auto"
+        className="w-full bg-transparent border-none focus:ring-0 resize-none py-4 px-6 text-lg font-body placeholder-on-surface-variant/50 text-on-surface min-h-[100px]"
         value={claim}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="Enter a medical claim, article URL, or symptom... (Press Ctrl+Enter to verify)"
-        rows={3}
+        rows={2}
         maxLength={1000}
         disabled={isLoading}
       />
       <button
         id="verify-claim-btn"
-        className={`m-2 bg-gradient-to-r from-primary to-tertiary text-on-primary px-8 py-4 rounded-lg font-body font-medium hover:from-primary-container hover:to-tertiary-container hover:text-on-primary-container hover:scale-105 hover:shadow-float transition-all duration-300 shadow-soft whitespace-nowrap flex items-center gap-2 justify-center group ${isLoading || claim.trim().length < 10 ? 'opacity-50 cursor-not-allowed' : 'hover:animate-sexy-pulse'}`}
+        className={`m-2 self-center sm:self-end mb-2 sm:mb-2 bg-primary-container text-white px-6 py-3 text-sm rounded-full font-body font-medium hover:bg-primary-container/90 transition-all duration-300 whitespace-nowrap flex items-center gap-2 justify-center group ${isLoading || claim.trim().length < 10 ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={handleSubmit}
         disabled={isLoading || claim.trim().length < 10}
       >
@@ -41,7 +41,7 @@ export default function ClaimInput({ onVerify, isLoading }) {
           </>
         ) : (
           <>
-            <span className="material-symbols-outlined group-hover:rotate-12 transition-transform">fact_check</span>
+            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">fact_check</span>
             Verify Claim
           </>
         )}

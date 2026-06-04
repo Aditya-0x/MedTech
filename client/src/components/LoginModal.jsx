@@ -187,7 +187,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-on-background/40 backdrop-blur-sm p-4 animate-fade-in-up" onClick={onClose}>
       <div 
-        className="glass-panel w-full max-w-md rounded-2xl shadow-float overflow-hidden flex flex-col relative"
+        className="bg-surface-container-lowest w-full max-w-md rounded-[32px] border border-outline/10 overflow-hidden flex flex-col relative"
         onClick={(e) => e.stopPropagation()}
       >
         <button className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface text-xl" onClick={onClose} aria-label="Close modal">✕</button>
@@ -226,7 +226,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
                       required
                     />
                   </div>
-                  <button type="submit" className="bg-primary text-on-primary py-3 rounded-lg font-body font-medium hover:bg-on-primary-fixed-variant transition-colors w-full mt-2 shadow-soft">
+                  <button type="submit" className="bg-primary-container text-white py-3 rounded-full font-body font-medium hover:bg-primary-container/90 transition-colors w-full mt-2">
                     Verify Email & Send OTP ➔
                   </button>
                 </form>
@@ -248,7 +248,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
                       required
                     />
                   </div>
-                  <button type="submit" className="bg-primary text-on-primary py-3 rounded-lg font-body font-medium hover:bg-on-primary-fixed-variant transition-colors w-full mt-2 shadow-soft">
+                  <button type="submit" className="bg-primary-container text-white py-3 rounded-full font-body font-medium hover:bg-primary-container/90 transition-colors w-full mt-2">
                     Next: Enter Security Code ➔
                   </button>
                 </form>
@@ -271,7 +271,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
                       required
                     />
                   </div>
-                  <button type="submit" className="bg-primary text-on-primary py-3 rounded-lg font-body font-medium hover:bg-on-primary-fixed-variant transition-colors w-full mt-2 shadow-soft flex items-center justify-center gap-2">
+                  <button type="submit" className="bg-primary-container text-white py-3 rounded-full font-body font-medium hover:bg-primary-container/90 transition-colors w-full mt-2 flex items-center justify-center gap-2">
                     Confirm Access Code <span className="material-symbols-outlined text-sm">login</span>
                   </button>
 

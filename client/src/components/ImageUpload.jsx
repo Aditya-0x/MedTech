@@ -71,7 +71,7 @@ export default function ImageUpload({ onVerify, isLoading }) {
       {!preview ? (
         <>
           <div
-            className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 transform group hover:scale-[1.01] hover:shadow-float ${dragOver ? 'border-primary bg-primary/10 animate-sexy-pulse' : 'border-outline-variant/60 hover:border-primary/80 bg-surface-container-low/50'}`}
+            className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 transform group hover:scale-[1.01] ${dragOver ? 'border-primary bg-primary/10' : 'border-outline/30 hover:border-primary/80 bg-surface-container-lowest/50'}`}
             onDrop={onDrop}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
@@ -87,7 +87,7 @@ export default function ImageUpload({ onVerify, isLoading }) {
               className="hidden"
               onChange={(e) => handleFile(e.target.files[0])}
             />
-            <span className="material-symbols-outlined text-5xl text-primary mb-4 group-hover:animate-float-sexy group-hover:text-tertiary transition-colors">image</span>
+            <span className="material-symbols-outlined text-5xl text-primary mb-4 group-hover:-translate-y-1 transition-transform group-hover:text-tertiary">image</span>
             <div className="font-headline text-3xl text-on-surface mb-2 group-hover:text-primary transition-colors">
               {dragOver ? 'Drop it like it\'s hot' : 'Upload Social Media Screenshot'}
             </div>
@@ -116,7 +116,7 @@ export default function ImageUpload({ onVerify, isLoading }) {
             </button>
           </div>
 
-          <div className="relative rounded-lg overflow-hidden border border-outline-variant max-h-48 flex justify-center bg-surface-container-lowest">
+          <div className="relative rounded-lg overflow-hidden border border-outline/20 max-h-48 flex justify-center bg-surface-container-lowest">
             <img src={preview} alt="Uploaded screenshot" className="object-contain h-full"/>
             <div className="absolute bottom-2 right-2 bg-background/90 backdrop-blur px-2 py-1 rounded text-xs font-body shadow-sm">
               🔍 OCR will extract text
@@ -126,7 +126,7 @@ export default function ImageUpload({ onVerify, isLoading }) {
           <div>
              <input
                type="text"
-               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 font-body text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+               className="w-full bg-surface-container-lowest border border-outline/20 rounded-lg px-4 py-2 font-body text-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                value={extraClaim}
                onChange={(e) => setExtraClaim(e.target.value)}
                placeholder="Add context or highlight a specific claim... (optional)"
@@ -139,7 +139,7 @@ export default function ImageUpload({ onVerify, isLoading }) {
               📎 {file?.name} · {(file?.size / 1024).toFixed(0)} KB
             </div>
             <button
-              className={`bg-gradient-to-r from-primary to-tertiary text-on-primary px-8 py-3 rounded-lg font-body font-medium hover:from-primary-container hover:to-tertiary-container hover:text-on-primary-container hover:scale-105 hover:shadow-float transition-all duration-300 shadow-soft flex items-center gap-2 group ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:animate-sexy-pulse'}`}
+              className={`bg-primary-container text-white px-8 py-3 rounded-full font-body font-medium hover:bg-primary-container/90 hover:scale-105 transition-all duration-300 flex items-center gap-2 group ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={handleSubmit}
               disabled={isLoading}
             >
