@@ -1,9 +1,5 @@
 const axios = require('axios');
 
-// Cache for Mappls OAuth token
-let mapplsAuthToken = null;
-let mapplsTokenExpiry = 0;
-
 /**
  * Calculates the Haversine distance between two sets of coordinates in kilometers.
  */
@@ -20,53 +16,20 @@ function getHaversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Get Mappls Access Token using OAuth 2.0 Client Credentials Flow
- */
-async function getMapplsAccessToken() {
-  const clientId = process.env.MAPPLS_CLIENT_ID;
-  const clientSecret = process.env.MAPPLS_CLIENT_SECRET;
-
-  if (!clientId || !clientSecret) {
-    throw new Error('Mappls Client ID or Client Secret is missing in environment variables.');
-  }
-
-  // Check if token is cached and valid
-  if (mapplsAuthToken && Date.now() < mapplsTokenExpiry) {
-    return mapplsAuthToken;
-  }
-
-  console.log('🔐 Fetching new Mappls OAuth Access Token...');
-  const url = 'https://outpost.mapmyindia.com/api/security/oauth/token';
-  const params = new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: clientId,
-    client_secret: clientSecret
-  });
-
-  const response = await axios.post(url, params.toString(), {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-  });
-
-  mapplsAuthToken = response.data.access_token;
-  // Token expires in response.data.expires_in seconds, subtract 5 mins (300s) buffer
-  const expiresInMs = (response.data.expires_in - 300) * 1000; 
-  mapplsTokenExpiry = Date.now() + expiresInMs;
-
-  return mapplsAuthToken;
-}
-
-/**
- * Fetch generic stores from Mappls
+ * Fetch generic stores from Mappls using Static Key
  */
 async function locatePharmaciesMappls(userLat, userLng, radius) {
-  try {
-    const token = await getMapplsAccessToken();
-    console.log(`🌐 Searching Mappls API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
+  const mapplsKey = process.env.MAPPLS_API_KEY || 'imkcskuaspxbmulyqyixixerybnflwqnuxxe';
+  console.log(`🌐 Searching Mappls API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
 
-    const url = `https://atlas.mappls.com/api/places/nearby/json?keywords=generic+pharmacy;jan+aushadhi&refLocation=${userLat},${userLng}&radius=${radius}`;
+  try {
+    const url = `https://search.mappls.com/search/places/nearby/json`;
     const response = await axios.get(url, {
-      headers: {
-        'Authorization': `bearer ${token}`
+      params: {
+        keywords: 'generic pharmacy;jan aushadhi',
+        refLocation: `${userLat},${userLng}`,
+        radius: radius,
+        access_token: mapplsKey
       },
       timeout: 10000
     });
@@ -183,12 +146,10 @@ async function locatePharmacies(lat, lng, radius = 20000) {
   const userLat = parseFloat(lat) || 12.9716;
   const userLng = parseFloat(lng) || 77.5946;
   
-  // 1. Try Mappls first for generic stores if credentials exist
-  if (process.env.MAPPLS_CLIENT_ID && process.env.MAPPLS_CLIENT_SECRET) {
-    const mapplsResults = await locatePharmaciesMappls(userLat, userLng, radius);
-    if (mapplsResults && mapplsResults.length > 0) {
-      return mapplsResults;
-    }
+  // 1. Try Mappls first for generic stores (always active now with hardcoded fallback key)
+  const mapplsResults = await locatePharmaciesMappls(userLat, userLng, radius);
+  if (mapplsResults && mapplsResults.length > 0) {
+    return mapplsResults;
   }
 
   // 2. Fallback to Ola Maps
