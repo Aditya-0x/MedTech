@@ -85,77 +85,81 @@ async function locatePharmaciesOSM(userLat, userLng, radius) {
 }
 
 /**
- * Primary location API: Attempts Mappls, falls back to OSM
+ * Primary location API: Attempts Ola Maps, falls back to OSM
  */
 async function locatePharmacies(lat, lng, radius = 20000) {
   const userLat = parseFloat(lat) || 12.9716;
   const userLng = parseFloat(lng) || 77.5946;
   
-  const mapplsKey = process.env.MAPPLS_API_KEY || 'umaeazoxvdlobrrgrgtxsgmlvtpvfhjtadfz';
+  const olaMapsKey = process.env.OLA_MAPS_API_KEY || 'iTZHFzXV3uzDZnj3zALr';
 
-  console.log(`🌐 Searching Mappls API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
+  console.log(`🌐 Searching Ola Krutrim Maps API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
 
   try {
-    const url = `https://apis.mappls.com/advancedmaps/v1/${mapplsKey}/nearby_search/json`;
+    const url = 'https://api.olamaps.io/places/v1/nearbysearch';
     const response = await axios.get(url, {
       params: {
-        keywords: 'jan aushadhi;generic pharmacy;discount pharmacy;pharmacy',
-        refLocation: `${userLat},${userLng}`,
-        radius: radius
+        location: `${userLat},${userLng}`,
+        types: 'pharmacy',
+        radius: radius,
+        api_key: olaMapsKey
       },
       headers: {
-        'Referer': 'https://med-tech-zeta.vercel.app',
-        'Origin': 'https://med-tech-zeta.vercel.app'
+        'X-Request-Id': Date.now().toString()
       },
       timeout: 10000
     });
 
-    const results = response.data?.suggestedLocations || [];
+    // Ola Maps typically returns a 'predictions' or 'results' array
+    const results = response.data?.predictions || response.data?.results || [];
     
     if (results.length > 0) {
-      console.log(`✅ Mappls returned ${results.length} locations`);
-      let mapplsPharmacies = results.map(place => {
-        const shopLat = place.latitude;
-        const shopLng = place.longitude;
+      console.log(`✅ Ola Krutrim Maps returned ${results.length} locations`);
+      let olaPharmacies = results.map(place => {
+        const location = place.geometry?.location || place.location || {};
+        const shopLat = location.lat;
+        const shopLng = location.lng;
+        // Calculate distance if not provided by API
         const distanceKm = place.distance ? place.distance / 1000 : getHaversineDistance(userLat, userLng, shopLat, shopLng);
         
-        const name = place.placeName || 'Local Pharmacy';
+        const name = place.name || place.description || 'Local Pharmacy';
         const isGeneric = name.toLowerCase().includes('generic') || name.toLowerCase().includes('jan aushadhi') || name.toLowerCase().includes('davaindia');
+        const formattedAddress = place.formatted_address || place.vicinity || 'Address not listed';
 
         return {
-          id: `mappls-${place.eLoc}`,
+          id: `ola-${place.place_id || place.id || Date.now()}`,
           name: name,
-          address: place.placeAddress || 'Address not listed',
-          phone: place.orderIndex || 'Call not listed', 
+          address: formattedAddress,
+          phone: place.formatted_phone_number || place.phone || 'Call not listed', 
           website: `https://www.google.com/maps/search/?api=1&query=${shopLat},${shopLng}`,
           latitude: shopLat,
           longitude: shopLng,
           distanceKm: parseFloat(distanceKm.toFixed(2)),
-          isOpen: true,
-          statusText: 'Mappls Verified Location',
+          isOpen: place.opening_hours ? (place.opening_hours.open_now !== false) : true,
+          statusText: 'Ola Maps Verified Location',
           isPartner: isGeneric
         };
       });
 
-      mapplsPharmacies.sort((a, b) => {
+      olaPharmacies.sort((a, b) => {
         if (a.isPartner && !b.isPartner) return -1;
         if (!a.isPartner && b.isPartner) return 1;
         return a.distanceKm - b.distanceKm;
       });
 
-      return mapplsPharmacies.slice(0, 15);
+      return olaPharmacies.slice(0, 15);
     } else {
-      console.log('⚠️ Mappls returned 0 results. Falling back to OSM...');
+      console.log('⚠️ Ola Maps returned 0 results. Falling back to OSM...');
     }
 
   } catch (err) {
     const status = err.response?.status;
-    const msg = err.response?.data?.error?.message || err.message;
-    console.error(`⚠️ Mappls API failed (Status: ${status}):`, msg);
+    const msg = err.response?.data?.error?.message || err.response?.data?.message || err.message;
+    console.error(`⚠️ Ola Maps API failed (Status: ${status}):`, msg);
     console.log('🔄 Initiating OpenStreetMap Fallback...');
   }
 
-  // If Mappls fails (e.g. 412 error) or returns 0 results, fall back to OpenStreetMap
+  // If Ola Maps fails (e.g. 401 Unauthorized, invalid key) or returns 0 results, fall back to OpenStreetMap
   return await locatePharmaciesOSM(userLat, userLng, radius);
 }
 
