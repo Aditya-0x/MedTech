@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import Header from './components/Header';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -72,6 +73,8 @@ function ContactPage() {
 
 ReactDOM.createRoot(document.getElementById('contact-root')).render(
   <React.StrictMode>
-    <ContactPage />
+    <BrowserRouter>
+      <ContactPage />
+    </BrowserRouter>
   </React.StrictMode>
 );
