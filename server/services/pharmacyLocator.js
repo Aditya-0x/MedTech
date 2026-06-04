@@ -102,6 +102,8 @@ async function locatePharmacies(lat, lng, radius = 20000) {
         location: `${userLat},${userLng}`,
         types: 'pharmacy',
         radius: radius,
+        withCentroid: true,
+        limit: 15,
         api_key: olaMapsKey
       },
       headers: {
@@ -116,15 +118,18 @@ async function locatePharmacies(lat, lng, radius = 20000) {
     if (results.length > 0) {
       console.log(`✅ Ola Krutrim Maps returned ${results.length} locations`);
       let olaPharmacies = results.map(place => {
-        const location = place.geometry?.location || place.location || {};
+        // The advanced API returns geometry inside centroid when withCentroid=true
+        const location = place.geometry?.location || place.centroid || place.location || {};
         const shopLat = location.lat;
         const shopLng = location.lng;
-        // Calculate distance if not provided by API
-        const distanceKm = place.distance ? place.distance / 1000 : getHaversineDistance(userLat, userLng, shopLat, shopLng);
+        // Calculate distance: Advanced API uses 'distance_meters'
+        const distanceKm = place.distance_meters 
+            ? place.distance_meters / 1000 
+            : (place.distance ? place.distance / 1000 : getHaversineDistance(userLat, userLng, shopLat, shopLng));
         
-        const name = place.name || place.description || 'Local Pharmacy';
+        const name = place.name || place.structured_formatting?.main_text || place.description || 'Local Pharmacy';
         const isGeneric = name.toLowerCase().includes('generic') || name.toLowerCase().includes('jan aushadhi') || name.toLowerCase().includes('davaindia');
-        const formattedAddress = place.formatted_address || place.vicinity || 'Address not listed';
+        const formattedAddress = place.formatted_address || place.structured_formatting?.secondary_text || place.description || 'Address not listed';
 
         return {
           id: `ola-${place.place_id || place.id || Date.now()}`,
