@@ -333,7 +333,7 @@ export default function App() {
 
               {/* Main Content Areas */}
               {(result || isLoading) && (
-                <div className="w-full max-w-4xl mx-auto px-6 py-16 flex flex-col items-center min-h-[50vh]">
+                <div className="w-full max-w-4xl mx-auto px-6 py-8 flex flex-col items-center min-h-[50vh]">
                   
                   {/* Result View */}
                   {result && (

@@ -53,9 +53,9 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
     <div className="w-full max-w-6xl mx-auto flex flex-col items-center animate-fade-in-up" id="result-card">
       
       {/* Verification Header / Hero */}
-      <section className="w-full max-w-5xl flex flex-col items-center text-center mb-20">
+      <section className="w-full max-w-5xl flex flex-col items-center text-center mb-10">
         
-        <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-primary-fixed border border-outline/10 mb-10">
+        <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-primary-fixed border border-outline/10 mb-6">
             <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
               {verdict === 'TRUE' ? 'verified' : verdict === 'FALSE' ? 'cancel' : 'warning'}
             </span>
@@ -64,11 +64,11 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
             </span>
         </div>
         
-        <h1 className="font-headline text-4xl md:text-5xl lg:text-6xl text-on-background leading-tight mb-8 max-w-4xl">
+        <h1 className="font-headline text-3xl md:text-4xl lg:text-5xl text-on-background leading-tight mb-4 max-w-4xl">
             "{result.claim}"
         </h1>
         
-        <div className="flex items-center gap-4 text-on-surface-variant font-body text-sm mb-8">
+        <div className="flex items-center gap-4 text-on-surface-variant font-body text-sm mb-6">
             <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[18px]">calendar_today</span> Analyzed {dateStr}</span>
             <span className="w-1 h-1 rounded-full bg-outline-variant"></span>
             <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[18px]">source</span> {totalSources} Sources Queried</span>
@@ -102,7 +102,7 @@ export default function ResultCard({ result, onReset, isAuthenticated, isSaved, 
 
       {/* Detailed Breakdown Grid */}
       <section className="w-full relative">
-        <div className="flex items-center justify-between border-b border-outline-variant/60 pb-4 mb-12">
+        <div className="flex items-center justify-between border-b border-outline-variant/60 pb-4 mb-6">
             <h2 className="font-headline text-3xl text-on-surface">Evidence Breakdown</h2>
             <p className="font-body text-sm text-on-surface-variant flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-[18px]">travel_explore</span> Explore the data
