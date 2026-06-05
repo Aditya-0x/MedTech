@@ -42,12 +42,20 @@ async function locatePharmaciesMappls(userLat, userLng, radius) {
         const shopLng = place.longitude;
         const distanceKm = place.distance ? place.distance / 1000 : getHaversineDistance(userLat, userLng, shopLat, shopLng);
         
+        const name = place.placeName || place.placeAddress || 'Generic Pharmacy';
+        const address = place.placeAddress || 'Address not listed';
+        
+        let googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${shopLat},${shopLng}`;
+        if (!shopLat || !shopLng) {
+          googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + address)}`;
+        }
+
         return {
           id: `mappls-${place.eLoc || Date.now()}`,
-          name: place.placeName || place.placeAddress || 'Generic Pharmacy',
-          address: place.placeAddress || 'Address not listed',
+          name: name,
+          address: address,
           phone: place.orderUrl || place.website || 'Call not listed',
-          website: `https://www.google.com/maps/search/?api=1&query=${shopLat},${shopLng}`,
+          website: googleMapsUrl,
           latitude: shopLat,
           longitude: shopLng,
           distanceKm: parseFloat(distanceKm.toFixed(2)),
@@ -140,19 +148,13 @@ async function locatePharmaciesOSM(userLat, userLng, radius) {
 }
 
 /**
- * Primary location API: Attempts Mappls -> Ola Maps -> OSM
+ * Primary location API: Attempts Ola Maps -> OSM
  */
 async function locatePharmacies(lat, lng, radius = 20000) {
   const userLat = parseFloat(lat) || 12.9716;
   const userLng = parseFloat(lng) || 77.5946;
   
-  // 1. Try Mappls first for generic stores (always active now with hardcoded fallback key)
-  const mapplsResults = await locatePharmaciesMappls(userLat, userLng, radius);
-  if (mapplsResults && mapplsResults.length > 0) {
-    return mapplsResults;
-  }
-
-  // 2. Fallback to Ola Maps
+  // 1. Try Ola Maps Primary Engine
   const olaMapsKey = process.env.OLA_MAPS_API_KEY || 'iTZHFzXV3uzDZnj3zALr';
   console.log(`🌐 Searching Ola Krutrim Maps API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
 
@@ -222,7 +224,7 @@ async function locatePharmacies(lat, lng, radius = 20000) {
     console.log('🔄 Initiating OpenStreetMap Fallback...');
   }
 
-  // 3. Fallback to OpenStreetMap
+  // 2. Fallback to OpenStreetMap
   return await locatePharmaciesOSM(userLat, userLng, radius);
 }
 
