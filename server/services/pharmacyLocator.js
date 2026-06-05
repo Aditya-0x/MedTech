@@ -155,7 +155,7 @@ async function locatePharmacies(lat, lng, radius = 20000) {
   const userLng = parseFloat(lng) || 77.5946;
   
   // 1. Try Ola Maps Primary Engine
-  const olaMapsKey = process.env.OLA_MAPS_API_KEY || 'iTZHFzXV3uzDZnj3zALr';
+  const olaMapsKey = process.env.OLA_MAPS_API_KEY || 'QUxMIFlPVVlgQkFTRSBUkUgQkVMT05HIFRPIFVT';
   console.log(`🌐 Searching Ola Krutrim Maps API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
 
   try {
