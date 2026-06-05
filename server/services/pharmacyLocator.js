@@ -148,83 +148,13 @@ async function locatePharmaciesOSM(userLat, userLng, radius) {
 }
 
 /**
- * Primary location API: Attempts Ola Maps -> OSM
+ * Primary location API: Uses OpenStreetMap (100% Free, No API Keys Required)
  */
 async function locatePharmacies(lat, lng, radius = 20000) {
   const userLat = parseFloat(lat) || 12.9716;
   const userLng = parseFloat(lng) || 77.5946;
   
-  // 1. Try Ola Maps Primary Engine
-  const olaMapsKey = process.env.OLA_MAPS_API_KEY || 'QUxMIFlPVVlgQkFTRSBUkUgQkVMT05HIFRPIFVT';
-  console.log(`🌐 Searching Ola Krutrim Maps API around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
-
-  try {
-    const url = 'https://api.olamaps.io/places/v1/nearbysearch/advanced';
-    const response = await axios.get(url, {
-      params: {
-        location: `${userLat},${userLng}`,
-        types: 'pharmacy',
-        radius: radius,
-        withCentroid: true,
-        limit: 15,
-        api_key: olaMapsKey
-      },
-      headers: {
-        'X-Request-Id': Date.now().toString()
-      },
-      timeout: 10000
-    });
-
-    const results = response.data?.predictions || response.data?.results || [];
-    
-    if (results.length > 0) {
-      console.log(`✅ Ola Krutrim Maps returned ${results.length} locations`);
-      let olaPharmacies = results.map(place => {
-        const location = place.geometry?.location || place.centroid || place.location || {};
-        const shopLat = location.lat;
-        const shopLng = location.lng;
-        const distanceKm = place.distance_meters 
-            ? place.distance_meters / 1000 
-            : (place.distance ? place.distance / 1000 : getHaversineDistance(userLat, userLng, shopLat, shopLng));
-        
-        const name = place.name || place.structured_formatting?.main_text || place.description || 'Local Pharmacy';
-        const isGeneric = name.toLowerCase().includes('generic') || name.toLowerCase().includes('jan aushadhi') || name.toLowerCase().includes('davaindia');
-        const formattedAddress = place.formatted_address || place.structured_formatting?.secondary_text || place.description || 'Address not listed';
-
-        return {
-          id: `ola-${place.place_id || place.id || Date.now()}`,
-          name: name,
-          address: formattedAddress,
-          phone: place.formatted_phone_number || place.phone || 'Call not listed', 
-          website: `https://www.google.com/maps/search/?api=1&query=${shopLat},${shopLng}`,
-          latitude: shopLat,
-          longitude: shopLng,
-          distanceKm: parseFloat(distanceKm.toFixed(2)),
-          isOpen: place.opening_hours ? (place.opening_hours.open_now !== false) : true,
-          statusText: 'Ola Maps Verified Location',
-          isPartner: isGeneric
-        };
-      });
-
-      olaPharmacies.sort((a, b) => {
-        if (a.isPartner && !b.isPartner) return -1;
-        if (!a.isPartner && b.isPartner) return 1;
-        return a.distanceKm - b.distanceKm;
-      });
-
-      return olaPharmacies.slice(0, 15);
-    } else {
-      console.log('⚠️ Ola Maps returned 0 results. Falling back to OSM...');
-    }
-
-  } catch (err) {
-    const status = err.response?.status;
-    const msg = err.response?.data?.error?.message || err.response?.data?.message || err.message;
-    console.error(`⚠️ Ola Maps API failed (Status: ${status}):`, msg);
-    console.log('🔄 Initiating OpenStreetMap Fallback...');
-  }
-
-  // 2. Fallback to OpenStreetMap
+  console.log(`🌐 Searching OpenStreetMap for pharmacies around lat: ${userLat}, lng: ${userLng} within ${radius}m...`);
   return await locatePharmaciesOSM(userLat, userLng, radius);
 }
 
