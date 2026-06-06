@@ -67,7 +67,7 @@ export default function ImageUpload({ onVerify, isLoading }) {
   };
 
   return (
-    <div className="w-full h-full flex flex-col p-4" onPaste={handlePaste}>
+    <div className="w-full h-full flex flex-col p-4 animate-fade-in-up" style={{ animationDuration: '0.3s' }} onPaste={handlePaste}>
       {!preview ? (
         <>
           <div

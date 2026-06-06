@@ -16,7 +16,7 @@ export default function ClaimInput({ onVerify, isLoading }) {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row w-full h-full relative">
+    <div className="flex flex-col sm:flex-row w-full h-full relative animate-fade-in-up" style={{ animationDuration: '0.3s' }}>
       <textarea
         id="claim-input"
         className="w-full bg-transparent border-none focus:ring-0 resize-none py-4 px-6 text-lg font-body placeholder-on-surface-variant/50 text-on-surface min-h-[100px]"

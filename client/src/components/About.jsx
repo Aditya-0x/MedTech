@@ -18,7 +18,7 @@ export default function About() {
           ℹ️ ABOUT MED-VERIFY PRO
         </div>
         
-        <h1 className="font-headline text-5xl md:text-7xl text-on-surface mb-8 leading-tight relative z-10">
+        <h1 className="font-headline text-4xl sm:text-5xl md:text-7xl text-on-surface mb-8 leading-tight relative z-10">
           Smarter Clinical <br className="hidden md:block" />
           <span className="text-primary italic">Veracity Pipelines</span>
         </h1>

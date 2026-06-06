@@ -51,7 +51,7 @@ export default function Contact({ user }) {
             ✉️ SECURE CHANNELS
           </div>
           
-          <h1 className="font-headline text-5xl md:text-6xl text-on-surface mb-6 leading-tight">
+          <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl text-on-surface mb-6 leading-tight">
             Get In Touch With <br />
             <span className="text-primary italic">Aditya Verma</span>
           </h1>

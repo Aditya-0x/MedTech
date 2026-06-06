@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import LegalModal from './LegalModal';
 
 export default function Footer() {
@@ -18,7 +19,7 @@ export default function Footer() {
           <nav className="flex flex-wrap justify-center md:justify-end gap-x-8 gap-y-4">
               <a className="font-body text-sm text-on-surface hover:text-primary hover:underline transition-all cursor-pointer font-medium" onClick={() => setLegalDoc('privacy')}>Privacy Policy</a>
               <a className="font-body text-sm text-on-surface hover:text-primary hover:underline transition-all cursor-pointer font-medium" onClick={() => setLegalDoc('terms')}>Terms of Service</a>
-              <a className="font-body text-sm text-on-surface hover:text-primary hover:underline transition-all cursor-pointer font-medium" href="/contact">Contact Support</a>
+              <Link className="font-body text-sm text-on-surface hover:text-primary hover:underline transition-all cursor-pointer font-medium" to="/contact">Contact Support</Link>
           </nav>
         </div>
       </footer>

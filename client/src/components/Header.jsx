@@ -21,11 +21,11 @@ export default function Header({ user, onLogout, showHero, theme, onToggleTheme,
   };
 
   return (
-    <header className="fixed top-0 w-full z-50 flex justify-between items-center px-10 h-20 bg-surface-container-lowest border-b border-outline/10 transition-all duration-300 ease-in-out">
+    <header className="fixed top-0 w-full z-50 flex justify-between items-center px-6 md:px-10 h-20 bg-surface-container-lowest border-b border-outline/10 transition-all duration-300 ease-in-out">
       <div className="flex items-center gap-16">
           <Link 
             to="/"
-            className="font-headline text-3xl font-bold text-gradient-primary drop-shadow-sm tracking-tight cursor-pointer mr-4 hover:scale-105 transition-transform duration-300" 
+            className="font-headline text-2xl sm:text-3xl font-bold text-gradient-primary drop-shadow-sm tracking-tight cursor-pointer mr-4 hover:scale-105 transition-transform duration-300" 
             onClick={handleNavClick}
           >
           MedVerify
@@ -117,69 +117,67 @@ export default function Header({ user, onLogout, showHero, theme, onToggleTheme,
           className="md:hidden text-on-surface"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 0" }}>menu</span>
+          <span className="material-symbols-outlined text-3xl transition-transform duration-200" style={{ fontVariationSettings: "'FILL' 0" }}>{isMenuOpen ? 'close' : 'menu'}</span>
         </button>
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="absolute top-20 left-0 w-full bg-background border-b border-outline-variant/60 shadow-lg p-6 flex flex-col gap-4 md:hidden z-40">
-           <Link
-            to="/"
-            className={`text-left font-body text-lg ${path === '/' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-            onClick={handleNavClick}
-          >
-            Claims
-          </Link>
+      <div className={`absolute top-20 left-0 w-full bg-surface-container-lowest border-b border-outline-variant/60 shadow-lg p-6 flex flex-col gap-4 md:hidden z-40 transition-all duration-300 ease-in-out origin-top ${isMenuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'}`}>
+         <Link
+          to="/"
+          className={`text-left font-body text-lg ${path === '/' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary transition-colors'}`}
+          onClick={handleNavClick}
+        >
+          Claims
+        </Link>
+        <Link
+          to="/trumeds"
+          className={`text-left font-body text-lg ${path === '/trumeds' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary transition-colors'}`}
+          onClick={handleNavClick}
+        >
+          TruMeds
+        </Link>
+        {user ? (
           <Link
-            to="/trumeds"
-            className={`text-left font-body text-lg ${path === '/trumeds' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
+            to="/history"
+            className={`text-left font-body text-lg ${path === '/history' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary transition-colors'}`}
             onClick={handleNavClick}
           >
-            TruMeds
+            Archive
           </Link>
-          {user ? (
-            <Link
-              to="/history"
-              className={`text-left font-body text-lg ${path === '/history' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-              onClick={handleNavClick}
-            >
-              Archive
-            </Link>
-          ) : (
-            <button
-              className={`text-left font-body text-lg ${path === '/history' ? 'text-primary font-bold' : 'text-on-surface-variant'}`}
-              onClick={onSignInClick}
-            >
-              Archive 🔒
-            </button>
-          )}
-          <Link
-            to="/contact"
-            className={`text-left font-body text-lg ${path === '/contact' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}
-            onClick={handleNavClick}
+        ) : (
+          <button
+            className={`text-left font-body text-lg ${path === '/history' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary transition-colors'}`}
+            onClick={onSignInClick}
           >
-            Contact
-          </Link>
-          <hr className="border-outline-variant/30 my-2" />
-          {user ? (
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                 <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full" />
-                 <span className="font-body font-medium text-on-surface">{user.name}</span>
-              </div>
-              <button onClick={handleLogoutClick} className="text-error">Logout</button>
+            Archive 🔒
+          </button>
+        )}
+        <Link
+          to="/contact"
+          className={`text-left font-body text-lg ${path === '/contact' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary transition-colors'}`}
+          onClick={handleNavClick}
+        >
+          Contact
+        </Link>
+        <hr className="border-outline-variant/30 my-2" />
+        {user ? (
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+               <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full" />
+               <span className="font-body font-medium text-on-surface">{user.name}</span>
             </div>
-          ) : (
-            <button 
-              className="w-full bg-primary-container text-white py-3 rounded-full font-body font-semibold"
-              onClick={handleSignIn}
-            >
-              Verify Now / Sign In
-            </button>
-          )}
-        </div>
-      )}
+            <button onClick={handleLogoutClick} className="text-error font-medium hover:underline transition-all">Logout</button>
+          </div>
+        ) : (
+          <button 
+            className="w-full bg-primary-container text-white py-3 rounded-full font-body font-semibold hover:bg-primary-container/90 transition-colors duration-300"
+            onClick={handleSignIn}
+          >
+            Verify Now / Sign In
+          </button>
+        )}
+      </div>
     </header>
   );
 }

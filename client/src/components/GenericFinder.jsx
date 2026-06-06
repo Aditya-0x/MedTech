@@ -148,7 +148,7 @@ export default function GenericFinder({ theme }) {
         <div className="inline-block bg-secondary-container/40 text-on-secondary-container px-4 py-1.5 rounded-full font-body text-sm font-bold tracking-wider uppercase mb-6 border border-secondary/20">
           💊 TruMeds Generic Finder
         </div>
-        <h1 className="font-headline text-5xl md:text-6xl text-on-surface mb-6 leading-tight">Prescription Analyzer & Shop Locator</h1>
+        <h1 className="font-headline text-3xl sm:text-5xl md:text-6xl text-on-surface mb-6 leading-tight">Prescription Analyzer & Shop Locator</h1>
         <p className="font-body text-xl text-on-surface-variant max-w-3xl mx-auto">
           Upload doctor prescriptions or medicine strips to find generic chemical formulations 
           and locate local Indian pharmacies or Jan Aushadhi Kendras sorted by real-time distance.

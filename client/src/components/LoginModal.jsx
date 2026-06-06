@@ -76,7 +76,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme, onT
             { 
               theme: theme === 'dark' ? 'dark' : 'filled_blue', 
               size: 'large', 
-              width: 320, 
+              width: Math.min(320, window.innerWidth - 64), 
               text: 'signin_with',
               shape: 'pill'
             }

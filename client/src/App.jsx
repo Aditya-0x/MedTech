@@ -278,11 +278,11 @@ export default function App() {
                   </div>
                   
                   <div className="relative z-10 max-w-4xl mx-auto text-center animate-fade-in-up">
-                    <h1 className="font-headline text-6xl md:text-8xl font-normal leading-[1.1] tracking-tight mb-6 drop-shadow-sm animate-fade-in-up text-on-surface text-center">
+                    <h1 className="font-headline text-4xl sm:text-6xl md:text-8xl font-normal leading-[1.1] tracking-tight mb-6 drop-shadow-sm animate-fade-in-up text-on-surface text-center">
                         <span className="text-gradient-primary inline-block" style={{ backgroundSize: '200% auto', animation: 'shimmer 4s linear infinite' }}>Truth in Medicine,</span><br />
                         <span className="italic text-primary inline-block mt-2" style={{ textShadow: '0 0 20px rgba(194,101,42,0.4)' }}>Beautifully Verified.</span>
                     </h1>
-                    <p className="font-body text-xl md:text-2xl text-on-surface-variant mb-16 max-w-2xl mx-auto font-light leading-relaxed">
+                    <p className="font-body text-lg md:text-2xl text-on-surface-variant mb-16 max-w-2xl mx-auto font-light leading-relaxed">
                         Cut through the noise. Paste any medical claim below to instantly check its validity against the world's most authoritative healthcare databases.
                     </p>
 
