@@ -52,7 +52,7 @@ export default function Contact({ user }) {
           </div>
           
           <h1 className="font-headline text-5xl md:text-6xl text-on-surface mb-6 leading-tight">
-            Get in Touch with <br />
+            Get In Touch With <br />
             <span className="text-primary italic">Aditya Verma</span>
           </h1>
           
@@ -151,7 +151,7 @@ export default function Contact({ user }) {
                 <label className="font-body text-sm font-bold text-on-surface">Subject</label>
                 <input 
                   type="text" 
-                  placeholder="FHIR Bundling Interoperability query" 
+                  placeholder="FHIR Bundling Interoperability Query" 
                   className="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-4 py-3.5 font-body text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition disabled:opacity-50"
                   value={formData.subject}
                   onChange={(e) => setFormData({...formData, subject: e.target.value})}

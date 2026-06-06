@@ -284,9 +284,6 @@ export default function GenericFinder({ theme }) {
                     <h3 className="font-headline text-3xl text-on-surface mb-2">{result.report.brandName} Equivalent</h3>
                     <p className="font-body text-primary font-bold tracking-widest uppercase text-sm">🧬 {result.report.therapeuticClass}</p>
                   </div>
-                  <div className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-body text-xs font-semibold flex items-center gap-1 border border-secondary/20">
-                    <span className="material-symbols-outlined text-[14px]">smart_toy</span> {result.report.modelUsed.replace('google/', '')}
-                  </div>
                 </div>
 
                 <div className="flex items-center gap-4 bg-surface-container-lowest border border-outline/10 p-6 rounded-lg mb-8">
@@ -335,7 +332,7 @@ export default function GenericFinder({ theme }) {
                         </div>
                       </div>
                     </div>
-                    <p className="text-xs text-secondary mt-4 font-body opacity-80">* Estimated average relative savings per 30-day course supply (in INR).</p>
+                    <p className="text-xs text-secondary mt-4 font-body opacity-80">* Estimated average relative savings per leaf (strip of 10 tablets) (in INR).</p>
                   </div>
                 ) : (
                   <div className="bg-surface-container-low border border-outline-variant/60 rounded-2xl p-6 mb-8">
@@ -392,22 +389,10 @@ export default function GenericFinder({ theme }) {
                           </span>
                         </div>
 
-                        <p className="font-body text-sm text-on-surface-variant mb-4 flex items-start gap-1">
+                        <p className="font-body text-sm text-on-surface-variant mb-5 flex items-start gap-1">
                           <span className="material-symbols-outlined text-[16px] mt-0.5 text-secondary">location_on</span> 
                           {shop.address}
                         </p>
-
-                        <div className="flex flex-wrap items-center gap-2 mb-5">
-                          <span className={`font-body text-xs font-bold px-2 py-1 rounded border ${shop.isOpen ? 'bg-tertiary-container text-on-tertiary-container border-tertiary/20' : 'bg-surface-variant text-on-surface-variant border-outline-variant/40'}`}>
-                            {shop.statusText}
-                          </span>
-                          
-                          {shop.isPartner && shop.partnerBenefit && (
-                            <span className="font-body text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">
-                              🎁 {shop.partnerBenefit}
-                            </span>
-                          )}
-                        </div>
 
                         <div className="flex gap-2">
                           <a 

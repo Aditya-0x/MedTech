@@ -18,7 +18,7 @@ Your task is to analyze manual medicine searches or visual images of medicine pa
 2. Resolve it to its exact generic formulation / active chemical ingredient.
 3. Determine the therapeutic class, typical dosage formulation, and a clear clinical description.
 4. Estimate realistic price indexes comparison strictly in Indian Rupees (INR / ₹) for the Indian market (comparing standard branded drug prices in India with affordable generic equivalents like Jan Aushadhi products), computing the savings percentage. 
-   CRITICAL: Prices MUST represent actual monthly (30-day course) Indian retail market costs in INR. DO NOT guess, extrapolate, or invent simulated prices using arbitrary conversion multipliers (e.g. converting USD prices). If you do not have high-confidence, verified knowledge of the actual real-world retail brand or generic price in the Indian domestic market, you MUST output 0 for both 'avgPriceBrand' and 'avgPriceGeneric', and set 'savingsPercentage' to 0.
+   CRITICAL: Prices MUST represent actual retail costs in INR per single leaf (strip of 10 tablets). DO NOT guess, extrapolate, or invent simulated prices using arbitrary conversion multipliers (e.g. converting USD prices). If you do not have high-confidence, verified knowledge of the actual real-world retail brand or generic price in the Indian domestic market per leaf (10 tablets), you MUST output 0 for both 'avgPriceBrand' and 'avgPriceGeneric', and set 'savingsPercentage' to 0.
 5. Highlight critical safety precautions or clinical warnings (contraindications, side-effects).
 
 RESPONSE FORMAT — Return ONLY valid JSON matching this exact structure:
@@ -28,9 +28,9 @@ RESPONSE FORMAT — Return ONLY valid JSON matching this exact structure:
   "therapeuticClass": "<e.g., Statin / HMG-CoA Reductase Inhibitor>",
   "dosageFormulation": "<e.g., 10mg, 20mg Tablets>",
   "clinicalUsage": "<brief summary of what the medicine treats and its mechanism of action>",
-  "avgPriceBrand": <number, estimated avg cost in INR for 30 days supply, e.g. 400.00>,
-  "avgPriceGeneric": <number, estimated generic/Jan Aushadhi cost in INR for 30 days supply, e.g. 45.00>,
-  "savingsPercentage": <integer representing savings, e.g. 88>,
+  "avgPriceBrand": <number, estimated avg cost in INR per leaf (strip of 10 tablets), e.g. 150.00>,
+  "avgPriceGeneric": <number, estimated generic/Jan Aushadhi cost in INR per leaf (strip of 10 tablets), e.g. 66.00>,
+  "savingsPercentage": <integer representing savings, e.g. 56>,
   "safetyPrecautions": [
     "<precaution 1>",
     "<precaution 2>",

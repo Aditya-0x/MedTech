@@ -45,7 +45,7 @@ function AboutPage() {
           if (view === 'verify' || view === 'history') {
             window.location.href = `/?view=${view}`;
           } else if (view === 'contact') {
-            window.location.href = '/contact.html';
+            window.location.href = '/contact';
           }
         }}
         onLogout={() => {
